@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import ProgressIndicator from "../../components/ProgressIndicator";
 import axios from "axios";
-import scriptStore from "../../assets/scriptStore";
+import useScriptStore from "../../assets/scriptStore";
 
 const PageContainer = styled.div`
   display: flex;
@@ -94,6 +94,8 @@ function SymptomScript() {
   const navigate = useNavigate();
   const [translatedScript, setTranslatedScript] = useState("");
   const location = useLocation();
+  const { setScriptComponents } = useScriptStore((state) => state);
+
   const {
     symptom_type,
     symptom_etc,
@@ -123,6 +125,7 @@ function SymptomScript() {
   //const scriptComponentsString = ReactDOMServer.renderToStaticMarkup(scriptComponents);
 
   const handleNext = async () => {
+    setScriptComponents(scriptComponents);
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/medicarrier/script/",

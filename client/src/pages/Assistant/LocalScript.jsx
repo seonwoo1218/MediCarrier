@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import ProgressIndicator from "../../components/ProgressIndicator";
-import scriptStore from "../../assets/scriptStore";
+import useScriptStore from "../../assets/scriptStore";
 
 const PageContainer = styled.div`
   display: flex;
@@ -87,8 +87,11 @@ function LocalScript() {
   const navigate = useNavigate();
   const location = useLocation();
   const { translatedScript, facility } = location.state || {};
+  const { setTransScriptComponents } = useScriptStore((state) => state);
 
   const handleNext = () => {
+    setTransScriptComponents(translatedScript);
+
     if (facility === "병원") {
       navigate("/select-condition");
     } else {

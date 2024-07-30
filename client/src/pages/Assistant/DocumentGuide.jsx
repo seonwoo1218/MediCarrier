@@ -5,7 +5,7 @@ import styled from "styled-components";
 import ProgressIndicator from "../../components/ProgressIndicator";
 import checkedIcon from "../../assets/icons/checked.svg";
 import uncheckedIcon from "../../assets/icons/unchecked.svg";
-import scriptStore from "../../assets/scriptStore";
+import useScriptStore from "../../assets/scriptStore";
 
 const PageContainer = styled.div`
   display: flex;
@@ -114,6 +114,7 @@ function DocumentGuide() {
   const [error, setError] = useState(null);
   const [selectedDoc, setSelectedDoc] = useState([]);
   const navigate = useNavigate();
+  const { setDocuments: setStoreDocuments } = useScriptStore();
 
   useEffect(() => {
     const fetchLatestAssist = async () => {
@@ -145,8 +146,10 @@ function DocumentGuide() {
             ? documentStr.split(",").map((doc) => doc.trim())
             : [];
           setDocuments(documentList);
+          setStoreDocuments(documentList); // 스토어에 documents 저장
         } else {
           setDocuments([]);
+          setStoreDocuments([]); // 스토어에 빈 배열 저장
         }
       } catch (err) {
         setError(err);
@@ -157,7 +160,7 @@ function DocumentGuide() {
     };
 
     fetchLatestAssist();
-  }, []);
+  }, [setStoreDocuments]);
 
   const handleDocumentClick = (index) => {
     setSelectedDoc((prevSelectedDoc) =>
