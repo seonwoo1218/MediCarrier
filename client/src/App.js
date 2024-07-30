@@ -25,7 +25,10 @@ import SelectInsuranceTypeW from "./pages/Assistant/SelectInsuranceTypeW";
 import DocumentGuide from "./pages/Assistant/DocumentGuide";
 import SelectPaid from "./pages/Assistant/SelectPaid";
 import SelectClaim from "./pages/Assistant/SelectClaim";
+<<<<<<< HEAD
 import MediCard from "./pages/MediCard/MediCard";
+=======
+>>>>>>> c455b9d8e0f9a347682aab77e77bec3ed62c16ca
 import NavBar from "./components/NavBar";
 import "./App.css";
 
@@ -85,7 +88,10 @@ function AppContent() {
         <Route path="/document-guide" element={<DocumentGuide />} />
         <Route path="/select-paid" element={<SelectPaid />} />
         <Route path="/select-claim" element={<SelectClaim />} />
+<<<<<<< HEAD
         <Route path="/medi-card" element={<MediCard />} />
+=======
+>>>>>>> c455b9d8e0f9a347682aab77e77bec3ed62c16ca
       </Routes>
       {!hideNavBarPaths.includes(location.pathname) && <NavBar />}
     </>

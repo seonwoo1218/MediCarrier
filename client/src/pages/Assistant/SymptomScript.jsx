@@ -28,6 +28,10 @@ const Container = styled.div`
 `;
 
 const Title = styled.h1`
+<<<<<<< HEAD
+=======
+  font-family: Pretendard;
+>>>>>>> c455b9d8e0f9a347682aab77e77bec3ed62c16ca
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;

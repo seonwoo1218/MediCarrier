@@ -71,7 +71,11 @@ const SetDate = () => {
           lineHeight: "normal",
           letterSpacing: "-0.5px",
           position: "fixed",
+<<<<<<< HEAD
           top: "550px",
+=======
+          top: "620px",
+>>>>>>> c455b9d8e0f9a347682aab77e77bec3ed62c16ca
           left: "293px",
         }}
         onClick={navigateToHome}

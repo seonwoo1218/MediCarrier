@@ -14,7 +14,11 @@ const NavBar = () => {
         <img src={HomeIcon} alt="Home" />
         <span>홈</span>
       </NavItem>
+<<<<<<< HEAD
       <NavItem to="/medi-card">
+=======
+      <NavItem to="/medical-card">
+>>>>>>> c455b9d8e0f9a347682aab77e77bec3ed62c16ca
         <img src={MedicalCardIcon} alt="Medical Card" />
         <span>의료 카드</span>
       </NavItem>

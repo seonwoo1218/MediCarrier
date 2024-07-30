@@ -41,6 +41,7 @@ function Home() {
         const userId = localStorage.getItem("userId");
         const token = localStorage.getItem("token");
 
+<<<<<<< HEAD
         const response = await axios.get("http://127.0.0.1:8000/medicarrier/register.trip/", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -50,6 +51,20 @@ function Home() {
             user: userId, // 사용자 ID를 쿼리 파라미터로 추가
           },
         });
+=======
+        const response = await axios.get(
+          "http://127.0.0.1:8000/medicarrier/register.trip/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            params: {
+              user: userId, // 사용자 ID를 쿼리 파라미터로 추가
+            },
+          }
+        );
+>>>>>>> c455b9d8e0f9a347682aab77e77bec3ed62c16ca
 
         if (response.data.length > 0) {
           setTripData(response.data[0]);
@@ -86,11 +101,24 @@ function Home() {
     daysSinceStart = Math.ceil((currentDate - start) / (1000 * 60 * 60 * 24));
   }
 
+<<<<<<< HEAD
   const formattedStartDate = tripData ? new Date(tripData.start_date).toLocaleDateString() : null;
   const formattedEndDate = tripData ? new Date(tripData.end_date).toLocaleDateString() : null;
 
   const isTripEnded = tripData ? currentDate > new Date(tripData.end_date) : false;
 
+=======
+  const formattedStartDate = tripData
+    ? new Date(tripData.start_date).toLocaleDateString()
+    : null;
+  const formattedEndDate = tripData
+    ? new Date(tripData.end_date).toLocaleDateString()
+    : null;
+
+  const isTripEnded = tripData
+    ? currentDate > new Date(tripData.end_date)
+    : false;
+>>>>>>> c455b9d8e0f9a347682aab77e77bec3ed62c16ca
 
   return (
     <>
@@ -138,7 +166,11 @@ function Home() {
                   여행 상태를 변경하려면 클릭해주세요
                 </div>
               </>
+<<<<<<< HEAD
             ) : country && startDate && endDate ? (
+=======
+            ) : tripData ? (
+>>>>>>> c455b9d8e0f9a347682aab77e77bec3ed62c16ca
               <>
                 <span
                   style={{
@@ -204,6 +236,7 @@ function Home() {
           내 여행
           <MyTripBox>
             <MyCountry>
+<<<<<<< HEAD
             여행 장소
             <InnerDiv>
               {tripData ? (
@@ -281,6 +314,85 @@ function Home() {
                     여행 일정을
                     <br />
                     설정해주세요
+=======
+              여행 장소
+              <InnerDiv>
+                {tripData ? (
+                  tripData.country
+                ) : (
+                  <>
+                    여행 장소를
+                    <br />
+                    설정해주세요
+                  </>
+                )}
+              </InnerDiv>
+            </MyCountry>
+            <MyDate>
+              여행 일정
+              {isTripEnded ? (
+                <div
+                  style={{
+                    width: 353,
+                    height: 147,
+                    position: "absolute",
+                    left: "21px",
+                    top: "240px",
+                    background: "rgba(74.04, 124.71, 255, 0.85)",
+                    borderRadius: 8,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      textAlign: "center",
+                      color: "white",
+                      fontSize: 20.5,
+                      fontFamily: "Pretendard",
+                      fontWeight: "600",
+                      wordWrap: "break-word",
+                      paddingBottom: "10px",
+                      textShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
+                    }}
+                  >
+                    여행이 종료되었어요
+                    <br />
+                    새로운 여행을 등록해주세요
+                  </div>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      color: "white",
+                      fontSize: 14,
+                      fontFamily: "Pretendard",
+                      fontWeight: "500",
+                      wordWrap: "break-word",
+                      wordSpacing: "-0.7px",
+                      textShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
+                    }}
+                  >
+                    새로운 여행 등록 시 <br />
+                    기존 여행 정보 및 트리피 어시스트 정보가 초기화돼요!
+                  </div>
+                </div>
+              ) : (
+                <InnerDiv>
+                  {tripData && tripData.start_date && tripData.end_date ? (
+                    <>
+                      출발일 <br />
+                      {formattedStartDate} <br />
+                      <br /> 도착일 <br />
+                      {formattedEndDate}
+                    </>
+                  ) : (
+                    <>
+                      여행 일정을
+                      <br />
+                      설정해주세요
+>>>>>>> c455b9d8e0f9a347682aab77e77bec3ed62c16ca
                     </>
                   )}
                 </InnerDiv>
