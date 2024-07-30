@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOMServer from "react-dom/server";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import ProgressIndicator from "../../components/ProgressIndicator";
 import axios from "axios";
+import scriptStore from "../../assets/scriptStore";
 
 const PageContainer = styled.div`
   display: flex;
@@ -103,47 +104,55 @@ function SymptomScript() {
     etc,
   } = location.state || {};
 
-
   const chronicDiseasesText = illness_etc ? illness_etc : "없고";
   const medicationsText = medicine_etc ? medicine_etc : "없습니다";
   const symptomsText =
-  symptom_type.length > 0
+    symptom_type.length > 0
       ? symptom_type.join(", ")
       : symptom_etc
       ? symptom_etc
       : "증상이 없습니다";
 
-      const scriptComponents = `
+  const scriptComponents = `
     안녕하세요. 저는 한국인 관광객 입니다.
     저는 ${symptom_start}부터 ${symptom_freq}으로 ${symptomsText}.
     최근 앓았던 질병이나 현재 앓고 있는 만성 질환은 ${chronicDiseasesText}이고, 현재 복용하고 있는 약은 ${medicationsText} 입니다.
     ${etc ? ` ${etc}` : ""}
   `;
-      // Convert JSX to HTML string
+  // Convert JSX to HTML string
   //const scriptComponentsString = ReactDOMServer.renderToStaticMarkup(scriptComponents);
 
   const handleNext = async () => {
     try {
-      const response = await axios.post("http://127.0.0.1:8000/medicarrier/script/", {
-        script: scriptComponents,
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`, // 인증 토큰 추가
+      const response = await axios.post(
+        "http://127.0.0.1:8000/medicarrier/script/",
+        {
+          script: scriptComponents,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // 인증 토큰 추가
+          },
         }
-      });
-  
+      );
+
       if (response.status !== 200) {
         throw new Error(`Failed to save script: ${response.statusText}`);
       }
-  
+
       const data = response.data;
       console.log("Script saved:", data);
-  
+
       setTranslatedScript(data.translated_script);
-      navigate("/local-script", { state: { translatedScript: data.translated_script } });
+      navigate("/local-script", {
+        state: { translatedScript: data.translated_script },
+      });
     } catch (error) {
-      console.error("Error saving script:", error.response ? error.response.data : error.message);
+      console.error(
+        "Error saving script:",
+        error.response ? error.response.data : error.message
+      );
     }
   };
 

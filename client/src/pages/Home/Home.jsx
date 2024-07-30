@@ -27,8 +27,8 @@ function Home() {
     navigate("/assist.record");
   };
 
-  const { country, startDate, endDate } = useTripStore();
-  const { insuranceType, insuranceName } = useInsuranceStore();
+  const { country, startDate, endDate, insuranceType } = useTripStore();
+  const { insuranceName } = useInsuranceStore();
   const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);
   const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
 
@@ -99,6 +99,14 @@ function Home() {
   const isTripEnded = tripData
     ? currentDate > new Date(tripData.end_date)
     : false;
+
+  console.log(
+    "현재 데이터 값:",
+    { country },
+    { startDate },
+    { endDate },
+    { insuranceType }
+  );
 
   return (
     <>
@@ -460,10 +468,10 @@ function Home() {
             </Contact>
           </AboutInsuranceBoxes>
         </AboutInsurance>
-        <Chatting>
+        {/* <Chatting>
           진행 중인 채팅 상황
           <img src="../img/arrow-right-white.svg" />
-        </Chatting>
+        </Chatting> */}
         <Blank></Blank>
       </HomeContainer>
     </>

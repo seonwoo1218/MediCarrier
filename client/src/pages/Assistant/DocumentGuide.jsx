@@ -5,6 +5,7 @@ import styled from "styled-components";
 import ProgressIndicator from "../../components/ProgressIndicator";
 import checkedIcon from "../../assets/icons/checked.svg";
 import uncheckedIcon from "../../assets/icons/unchecked.svg";
+import scriptStore from "../../assets/scriptStore";
 
 const PageContainer = styled.div`
   display: flex;
@@ -13,7 +14,6 @@ const PageContainer = styled.div`
   height: 100vh;
   background: #fafafa;
   overflow-y: auto;
-
 `;
 
 const Container = styled.div`

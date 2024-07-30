@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import ProgressIndicator from "../../components/ProgressIndicator";
+import scriptStore from "../../assets/scriptStore";
 
 const PageContainer = styled.div`
   display: flex;
@@ -87,7 +88,6 @@ function LocalScript() {
   const location = useLocation();
   const { translatedScript, facility } = location.state || {};
 
-
   const handleNext = () => {
     if (facility === "병원") {
       navigate("/select-condition");
@@ -106,7 +106,9 @@ function LocalScript() {
           스크립트를 확인해보세요!
         </Title>
         <Subtitle>번역된 스크립트는 다음과 같습니다:</Subtitle>
-        <ScriptText>{translatedScript || "번역된 스크립트가 없습니다."}</ScriptText>
+        <ScriptText>
+          {translatedScript || "번역된 스크립트가 없습니다."}
+        </ScriptText>
         <ButtonContainer>
           <Button onClick={() => navigate(-1)} primary={false}>
             이전
