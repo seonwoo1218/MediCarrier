@@ -91,6 +91,7 @@ function LocalScript() {
 
   const handleNext = () => {
     setTransScriptComponents(translatedScript);
+    console.log(translatedScript);
 
     if (facility === "병원") {
       navigate("/select-condition");

@@ -61,7 +61,7 @@ function AppContent() {
         <Route path="/register.trip" element={<SetCountry />} />
         <Route path="/register.trip.date" element={<SetDate />} />
         {/* 어시스트 이용 기록 */}
-        <Route path="/assist.record" element={<AssistRecord />} />
+        <Route path="/script" element={<AssistRecord />} />
         {/* 보험 알아보기 */}
         <Route path="/insurance.feature" element={<InsFeature />} />
         <Route path="/insurance.step" element={<InsStep />} />

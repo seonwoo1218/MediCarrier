@@ -1,12 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import useScriptStore from "../../assets/scriptStore";
+import useScriptStore, { onGetScript } from "../../assets/scriptStore";
 
 const AssistRecord = () => {
   const { scriptComponents, transScriptComponents, documents } =
     useScriptStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchScriptData = async () => {
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        await onGetScript();
+      }
+    };
+
+    fetchScriptData();
+  }, []);
+
   const navigateToHome = () => {
     navigate("/home");
   };
@@ -87,7 +99,6 @@ const ScriptBox = styled.div`
   padding: 16px 20px 20px 20px;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
   align-self: stretch;
   border-radius: 12px;
   border: 1px solid #f5f5f5;

@@ -125,7 +125,10 @@ function SymptomScript() {
   //const scriptComponentsString = ReactDOMServer.renderToStaticMarkup(scriptComponents);
 
   const handleNext = async () => {
-    setScriptComponents(scriptComponents);
+    const scriptDate = new Date().toISOString();
+    setScriptComponents({ scriptComponents, scriptDate });
+    console.log(scriptComponents, scriptDate);
+
     try {
       const response = await axios.post(
         "https://minsi.pythonanywhere.com/medicarrier/script/",
