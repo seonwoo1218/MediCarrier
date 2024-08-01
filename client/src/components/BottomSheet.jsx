@@ -2,12 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { useDrag } from "@use-gesture/react";
 
-// shouldForwardProp을 사용하여 불필요한 prop이 DOM으로 전달되지 않도록 설정합니다.
 const Sheet = styled.div.withConfig({
   shouldForwardProp: (prop) => !["isOpen", "isExpand"].includes(prop),
 })`
   position: fixed;
-  bottom: 0;
+  bottom: 20px;
   left: 0;
   right: 0;
   background: white;
@@ -16,12 +15,12 @@ const Sheet = styled.div.withConfig({
   transition: transform 0.3s ease;
   width: 393px;
   height: 50%;
-  max-height: 70%;
+  max-height: 50%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   z-index: 0;
-  touch-action: none; /* 추가: 터치 제스처 문제 해결을 위해 touch-action: none; 설정 */
+  touch-action: none; /* 터치 제스처 문제 해결 */
 `;
 
 const Overlay = styled.div.withConfig({
@@ -32,7 +31,6 @@ const Overlay = styled.div.withConfig({
   left: 0;
   right: 0;
   top: 0;
-  background: rgba(0, 0, 0, 0.5);
   display: ${({ isOpen }) => (isOpen ? "block" : "none")};
   z-index: 0;
 `;
@@ -43,11 +41,12 @@ const Head = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative; /* 상대적 위치 설정 */
+  touch-action: none; /* 터치 제스처 비활성화 */
   p {
     color: var(--black, #000);
     font-family: Pretendard;
     font-size: 18px;
-    font-style: normal;
     font-weight: 550;
     line-height: normal;
     letter-spacing: -0.64px;
@@ -62,18 +61,23 @@ const DragHandle = styled.div`
   background: #ccc;
   border-radius: 5px;
   cursor: pointer;
+  position: absolute; /* 절대적 위치 설정 */
+  top: 10px; /* 헤더 내에서 드래그 핸들 위치 조정 */
 `;
 
 const Content = styled.div`
   flex: 1;
-  padding: 16px;
+  padding: 0 20px 80px 20px;
   overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 `;
 
-const BottomSheet = ({ isOpen, onClose, children }) => {
-  const [isExpand, setIsExpand] = useState(false);
-  const [translateY, setTranslateY] = useState(200); // 기본 위치를 200px 아래로 설정
-  const [initialOffset, setInitialOffset] = useState(200); // 초기 오프셋을 200px로 설정
+const BottomSheet = ({ isOpen, onClose, children, autoExpand }) => {
+  const [isExpand, setIsExpand] = useState(autoExpand);
+  const [translateY, setTranslateY] = useState(autoExpand ? 0 : 200);
+  const [initialOffset, setInitialOffset] = useState(autoExpand ? 0 : 200);
   const sheetRef = useRef(null);
 
   const bind = useDrag(
@@ -86,80 +90,52 @@ const BottomSheet = ({ isOpen, onClose, children }) => {
       // 드래그 방향이 위쪽일 때
       if (state.offset[1] < 0) {
         setIsExpand(true);
-        setTranslateY(Math.max(state.offset[1] + initialOffset, 0)); // 컨텐츠가 보이도록
-      } else {
+        setTranslateY(Math.max(state.offset[1] + initialOffset, 0));
+      } else if (state.offset[1] >= 0) {
         // 드래그 방향이 아래쪽일 때
         setIsExpand(false);
-        setTranslateY(Math.min(state.offset[1] + initialOffset, 200)); // 초기 위치로 돌아가도록 설정
+        setTranslateY(Math.min(state.offset[1] + initialOffset, 200));
       }
     },
     {
       from: () => [0, translateY],
       filterTaps: true,
-      bounds: { top: -200, bottom: 0 }, // 드래그 범위 설정
+      bounds: { top: -200, bottom: 0 },
+      enabled: (state) => state.offset[1] < -10, // 헤더 영역에서만 드래그 허용
     }
   );
 
   useEffect(() => {
     if (isOpen) {
-      setTranslateY(200); // Bottom Sheet의 기본 위치를 200px로 설정
-      setIsExpand(false);
+      setTranslateY(autoExpand ? 0 : 200);
+      setIsExpand(autoExpand);
     }
-  }, [isOpen]);
+  }, [isOpen, autoExpand]);
 
   return (
     <>
       <Overlay isOpen={isOpen} onClick={onClose} />
       <Sheet
-        {...bind()}
         ref={sheetRef}
         isExpand={isExpand}
         style={{ transform: `translateY(${translateY}px)` }}
       >
-        <Head>
+        <Head {...bind()}>
           <DragHandle />
           <p>검색 결과</p>
         </Head>
         {isExpand && (
           <Content>
-            {children} What is Lorem Ipsum? Lorem Ipsum is simply dummy text of
-            the printing and typesetting industry. Lorem Ipsum has been the
-            industry's standard dummy text ever since the 1500s, when an unknown
-            printer took a galley of type and scrambled it to make a type
-            specimen book. It has survived not only five centuries, but also the
-            leap into electronic typesetting, remaining essentially unchanged.
-            It was popularised in the 1960s with the release of Letraset sheets
-            containing Lorem Ipsum passages, and more recently with desktop
-            publishing software like Aldus PageMaker including versions of Lorem
-            Ipsum. What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the
-            printing and typesetting industry. Lorem Ipsum has been the
-            industry's standard dummy text ever since the 1500s, when an unknown
-            printer took a galley of type and scrambled it to make a type
-            specimen book. It has survived not only five centuries, but also the
-            leap into electronic typesetting, remaining essentially unchanged.
-            It was popularised in the 1960s with the release of Letraset sheets
-            containing Lorem Ipsum passages, and more recently with desktop
-            publishing software like Aldus PageMaker including versions of Lorem
-            Ipsum. What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the
-            printing and typesetting industry. Lorem Ipsum has been the
-            industry's standard dummy text ever since the 1500s, when an unknown
-            printer took a galley of type and scrambled it to make a type
-            specimen book. It has survived not only five centuries, but also the
-            leap into electronic typesetting, remaining essentially unchanged.
-            It was popularised in the 1960s with the release of Letraset sheets
-            containing Lorem Ipsum passages, and more recently with desktop
-            publishing software like Aldus PageMaker including versions of Lorem
-            Ipsum. What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the
-            printing and typesetting industry. Lorem Ipsum has been the
-            industry's standard dummy text ever since the 1500s, when an unknown
-            printer took a galley of type and scrambled it to make a type
-            specimen book. It has survived not only five centuries, but also the
-            leap into electronic typesetting, remaining essentially unchanged.
-            It was popularised in the 1960s with the release of Letraset sheets
-            containing Lorem Ipsum passages, and more recently with desktop
-            publishing software like Aldus PageMaker including versions of Lorem
-            Ipsum.
-            {/* 여기에 Bottom Sheet의 내용을 추가하세요 */}
+            {React.Children.map(children, (child) =>
+              React.cloneElement(child, {
+                onClick: (e) => {
+                  // 자식 컴포넌트의 클릭 이벤트 처리
+                  if (child.props.onClick) {
+                    child.props.onClick(e);
+                  }
+                },
+              })
+            )}
           </Content>
         )}
       </Sheet>
