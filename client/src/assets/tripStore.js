@@ -24,8 +24,7 @@ const useTripStore = create((set) => ({
 // 백 api 연결
 const onPost = async () => {
   // Zustand에서 상태 가져오기
-  const { country, startDate, endDate, insuranceType } =
-    useTripStore.getState();
+  const { country, startDate, endDate } = useTripStore.getState();
 
   // 로컬 스토리지에서 사용자 ID 가져오기
   const userId = localStorage.getItem("userId");
@@ -35,7 +34,6 @@ const onPost = async () => {
     country: country,
     start_date: startDate,
     end_date: endDate,
-    insuranceType: insuranceType,
     user: userId, // 사용자 ID 추가
   };
 

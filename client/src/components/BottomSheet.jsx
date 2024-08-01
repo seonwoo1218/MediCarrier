@@ -14,8 +14,9 @@ const Sheet = styled.div.withConfig({
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease;
-  height: 70%;
-  max-height: 50%;
+  width: 393px;
+  height: 50%;
+  max-height: 70%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
