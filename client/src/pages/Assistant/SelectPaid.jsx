@@ -11,8 +11,6 @@ const PageContainer = styled.div`
   height: 100vh;
   background: #fafafa;
   overflow-y: auto;
-
-
 `;
 
 const Container = styled.div`
@@ -101,11 +99,7 @@ const Button = styled.button`
   margin-top: 266px;
 `;
 
-const hospitalFees = [
-  "3만원 미만",
-  "3만원 이상 ~ 10만원 미만",
-  "10만원 이상"
-];
+const hospitalFees = ["3만원 미만", "3만원 이상 ~ 10만원 미만", "10만원 이상"];
 
 function SelectPaid() {
   const navigate = useNavigate();
@@ -123,7 +117,7 @@ function SelectPaid() {
     ins_req1,
     ins_req2,
   } = location.state || {};
-  
+
   const [selected, setSelected] = useState(null);
 
   const handleSelect = (fee) => {
@@ -137,7 +131,7 @@ function SelectPaid() {
       try {
         // POST 요청 보내기
         const response = await axios.post(
-          "http://127.0.0.1:8000/medicarrier/assist/",
+          "https://minsi.pythonanywhere.com/medicarrier/assist/",
           {
             user: userId,
             facility,
@@ -182,13 +176,16 @@ function SelectPaid() {
               hospital_fee: selected,
               disease_detail: "암",
               document: "",
-            }
+            },
           });
         } else {
           console.error("Failed to save data:", response.statusText);
         }
       } catch (error) {
-        console.error("Error saving data:", error.response ? error.response.data : error.message);
+        console.error(
+          "Error saving data:",
+          error.response ? error.response.data : error.message
+        );
       }
     }
   };

@@ -120,7 +120,7 @@ function DocumentGuide() {
     const fetchLatestAssist = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/medicarrier/assist/",
+          "https://minsi.pythonanywhere.com/medicarrier/assist/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

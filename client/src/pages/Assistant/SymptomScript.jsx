@@ -128,7 +128,7 @@ function SymptomScript() {
     setScriptComponents(scriptComponents);
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/medicarrier/script/",
+        "https://minsi.pythonanywhere.com/medicarrier/script/",
         {
           script: scriptComponents,
         },

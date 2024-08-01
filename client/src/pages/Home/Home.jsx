@@ -42,7 +42,7 @@ function Home() {
         const token = localStorage.getItem("token");
 
         const response = await axios.get(
-          "http://127.0.0.1:8000/medicarrier/register.trip/",
+          "https://minsi.pythonanywhere.com/medicarrier/register.trip/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -99,14 +99,6 @@ function Home() {
   const isTripEnded = tripData
     ? currentDate > new Date(tripData.end_date)
     : false;
-
-  console.log(
-    "현재 데이터 값:",
-    { country },
-    { startDate },
-    { endDate },
-    { insuranceType }
-  );
 
   return (
     <>
@@ -468,10 +460,10 @@ function Home() {
             </Contact>
           </AboutInsuranceBoxes>
         </AboutInsurance>
-        {/* <Chatting>
+        <Chatting>
           진행 중인 채팅 상황
           <img src="../img/arrow-right-white.svg" />
-        </Chatting> */}
+        </Chatting>
         <Blank></Blank>
       </HomeContainer>
     </>

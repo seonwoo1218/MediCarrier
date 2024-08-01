@@ -25,7 +25,10 @@ import SelectInsuranceTypeW from "./pages/Assistant/SelectInsuranceTypeW";
 import DocumentGuide from "./pages/Assistant/DocumentGuide";
 import SelectPaid from "./pages/Assistant/SelectPaid";
 import SelectClaim from "./pages/Assistant/SelectClaim";
+import InputSearch from "./pages/Search/InputSearch";
+import MapSearch from "./pages/Search/MapSearch";
 import NavBar from "./components/NavBar";
+
 import "./App.css";
 
 function ScrollToTop() {
@@ -84,6 +87,9 @@ function AppContent() {
         <Route path="/document-guide" element={<DocumentGuide />} />
         <Route path="/select-paid" element={<SelectPaid />} />
         <Route path="/select-claim" element={<SelectClaim />} />
+        {/* 검색 */}
+        <Route path="/search" element={<InputSearch />} />
+        <Route path="/search.map" element={<MapSearch />} />
       </Routes>
       {!hideNavBarPaths.includes(location.pathname) && <NavBar />}
     </>
