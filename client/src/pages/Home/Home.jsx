@@ -28,7 +28,8 @@ function Home() {
     navigate("/script");
   };
 
-  const { country, startDate, endDate, insuranceType } = useTripStore();
+  const { country, startDate, endDate } = useTripStore();
+  const insuranceType = useTripStore((state) => state.insuranceType);
   const { insuranceName } = useInsuranceStore();
   const { scriptComponents, scriptDate } = useScriptStore();
   const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);

@@ -9,7 +9,8 @@ function InsuranceModal({ onClose }) {
   const [answers, setAnswers] = useState({});
   const [showRecommendation, setShowRecommendation] = useState(false);
   const [clickedButtons, setClickedButtons] = useState({}); // 단계별 클릭된 버튼 상태
-  const { insuranceType, setInsuranceType } = useTripStore();
+  const insuranceType = useTripStore((state) => state.insuranceType);
+  const setInsuranceType = useTripStore((state) => state.setInsuranceType);
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
@@ -127,12 +128,19 @@ function InsuranceModal({ onClose }) {
     }
     return "#f8f8f8"; // 기본 색상
   };
+
   // API 호출 함수
   const updateInsuranceData = async () => {
+    const userId = localStorage.getItem("userId");
+
     try {
       const response = await axios.put(
         "https://minsi.pythonanywhere.com/medicarrier/register.trip/",
-        { insuranceType },
+        {
+          insuranceType: insuranceType,
+          user: userId,
+          // 기타 필요한 데이터들
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -140,7 +148,7 @@ function InsuranceModal({ onClose }) {
           },
         }
       );
-      console.log("Insurance data updated successfully:", response.data);
+      console.log("Response:", response.data);
     } catch (error) {
       console.error("Error updating insurance data:", error);
     }
