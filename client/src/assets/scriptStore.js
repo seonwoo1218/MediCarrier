@@ -68,7 +68,6 @@ const onGetScript = async () => {
         scriptComponents: latestScript.original_script,
         transScriptComponents: latestScript.translated_script,
         scriptDate: latestScript.created_at,
-        documents: latestScript.documents || [],
       });
     }
 

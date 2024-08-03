@@ -56,12 +56,10 @@ const MapPharmacyView = () => {
   };
 
   const handleNext = () => {
-    if (selected) {
-      const selectedPharmacy = pharmacies.find(
-        (pharmacy) => pharmacy.place_id === selected
-      );
-      navigate("/symptom-form", { state: { selectedPharmacy } });
-    }
+    const selectedPharmacy = pharmacies.find(
+      (pharmacy) => pharmacy.place_id === selected
+    );
+    navigate("/symptom-pharm-form", { state: { selectedPharmacy } });
   };
 
   const handleMoreInfo = (placeId) => {
@@ -144,7 +142,7 @@ const MapPharmacyView = () => {
           <Button onClick={() => navigate(-1)} primary={false}>
             이전
           </Button>
-          <Button onClick={handleNext} primary={true} disabled={!selected}>
+          <Button onClick={handleNext} primary={true}>
             다음
           </Button>
         </ButtonContainer>
