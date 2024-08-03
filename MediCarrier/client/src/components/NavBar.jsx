@@ -151,7 +151,7 @@ const HomeText = styled.span`
   font-family: Pretendard;
   font-size: 12px;
   font-weigth: 400px;
-  margin-left: 15px;
+  margin-left: 10px;
 `;
 
 const MediCardText = styled.span`

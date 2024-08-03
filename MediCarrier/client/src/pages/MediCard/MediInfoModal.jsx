@@ -2,8 +2,16 @@ import React, { useState } from "react";
 import axios from "axios"; // axios 불러오기
 import styled from "styled-components";
 
-const MediInfoModal = ({ mediInfo, setMediInfo, onClose }) => {
+const MediInfoModal = ({ selectedCountry, mediInfo, setMediInfo, onClose }) => {
   const [formState, setFormState] = useState(mediInfo);
+
+  const isSameValues = JSON.stringify(mediInfo) === JSON.stringify(formState);
+
+  const areAllValuesEmpty = (obj) => {
+    return Object.values(obj).every(
+      (value) => value === "" || value === null || value === undefined
+    );
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,11 +27,11 @@ const MediInfoModal = ({ mediInfo, setMediInfo, onClose }) => {
 
     try {
       const response = await axios({
-        method: "post",
+        method: areAllValuesEmpty(mediInfo) ? "post" : "put",
         url: "https://minsi.pythonanywhere.com/medicarrier/mediinfo/",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
         data: formState,
       });
@@ -34,66 +42,117 @@ const MediInfoModal = ({ mediInfo, setMediInfo, onClose }) => {
         );
       }
 
-      setMediInfo(response.data);
+      setMediInfo(formState);
       onClose();
     } catch (error) {
       console.error("Failed to save medical information", error);
     }
   };
 
+  function isNotEmpty(value) {
+    if (value === null || value === undefined) return false;
+    if (typeof value === "string" && value.trim() === "") return false;
+    if (Array.isArray(value) && value.length === 0) return false;
+    if (typeof value === "object" && Object.keys(value).length === 0)
+      return false;
+    return true;
+  }
+
+  function checkObjectValues(obj) {
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (!isNotEmpty(obj[key])) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   return (
     <ModalOverlay>
       <ModalContent>
         <ModalHeader>
           <ModalTitle>의료 정보 수정</ModalTitle>
-          <SaveButton onClick={handleSave}>저장</SaveButton>
+          <SaveButton
+            disabled={
+              areAllValuesEmpty(mediInfo)
+                ? !checkObjectValues(formState)
+                : isSameValues
+            }
+            onClick={isSameValues ? undefined : handleSave}
+          >
+            저장
+          </SaveButton>
         </ModalHeader>
         <ModalBody>
           <InputRow>
-            <InputLabel>몸 상태</InputLabel>
+            <InputLabel>
+              {selectedCountry === "한국"
+                ? "몸 상태"
+                : Object.keys(mediInfo)[0]}
+            </InputLabel>
             <Input
-              name="몸 상태"
-              value={formState.condition}
+              name={Object.keys(mediInfo)[0]}
+              value={Object.values(formState)[0]}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>지병</InputLabel>
+            <InputLabel>
+              {selectedCountry === "한국" ? "지병" : Object.keys(mediInfo)[1]}
+            </InputLabel>
             <Input
-              name="지병"
-              value={formState.illness}
+              name={Object.keys(mediInfo)[1]}
+              value={Object.values(formState)[1]}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>현재 복용 약</InputLabel>
+            <InputLabel>
+              {selectedCountry === "한국"
+                ? "현재 복용 약"
+                : Object.keys(mediInfo)[2]}
+            </InputLabel>
             <Input
-              name="현재 복용 약"
-              value={formState.medicine}
+              name={Object.keys(mediInfo)[2]}
+              value={Object.values(formState)[2]}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>알러지 유무</InputLabel>
+            <InputLabel>
+              {selectedCountry === "한국"
+                ? "알러지 유무"
+                : Object.keys(mediInfo)[3]}
+            </InputLabel>
             <Input
-              name="알러지 유무"
-              value={formState.allergy}
+              name={Object.keys(mediInfo)[3]}
+              value={Object.values(formState)[3]}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>진료 기록</InputLabel>
+            <InputLabel>
+              {selectedCountry === "한국"
+                ? "진료 기록"
+                : Object.keys(mediInfo)[4]}
+            </InputLabel>
             <Input
-              name="진료 기록"
-              value={formState.diagnosis}
+              name={Object.keys(mediInfo)[4]}
+              value={Object.values(formState)[4]}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>수술 기록</InputLabel>
+            <InputLabel>
+              {selectedCountry === "한국"
+                ? "수술 기록"
+                : Object.keys(mediInfo)[5]}
+            </InputLabel>
             <Input
-              name="수술 기록"
-              value={formState.surgery}
+              name={Object.keys(mediInfo)[5]}
+              value={Object.values(formState)[5]}
               onChange={handleChange}
             />
           </InputRow>
@@ -136,11 +195,27 @@ const ModalHeader = styled.div`
 `;
 
 const ModalTitle = styled.div`
-  font-family: Pretendard;
+  font-family: "Pretendard";
   font-size: 18px;
   font-weight: bold;
   text-align: center;
   flex: 1;
+`;
+
+const SaveButton = styled.button`
+  font-family: "Pretendard";
+  width: 40px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${(props) => (props.disabled ? "#CED4DA" : "#4a7dff")};
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: ${(props) => (props.disabled ? "default" : "pointer")};
+  position: absolute;
+  right: 0;
 `;
 
 const ModalBody = styled.div`
@@ -158,7 +233,7 @@ const InputRow = styled.div`
 
 const InputLabel = styled.label`
   color: #6f6f6f;
-  font-family: Pretendard;
+  font-family: "Pretendard";
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
@@ -169,7 +244,7 @@ const InputLabel = styled.label`
 const Input = styled.input`
   color: #000;
   text-align: right;
-  font-family: Pretendard;
+  font-family: "Pretendard";
   font-size: 14px;
   font-style: normal;
   font-weight: 600;
@@ -182,20 +257,4 @@ const Input = styled.input`
   &:focus {
     outline: none;
   }
-`;
-
-const SaveButton = styled.button`
-  font-family: Pretendard;
-  width: 40px;
-  height: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #4a7dff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  position: absolute;
-  right: 0;
 `;
