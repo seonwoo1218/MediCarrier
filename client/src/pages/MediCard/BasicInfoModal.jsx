@@ -165,7 +165,7 @@ const BasicInfoModal = ({
             <Input
               name={Object.keys(basicInfo)[4]}
               value={Object.values(formState)[4]}
-              onChange={handleChange}
+              // onChange={handleChange}
             />
           </InputRow>
           <InputRow>

@@ -111,7 +111,10 @@ const AssistRecord = () => {
             <DocumentBox>
               {documents.length > 0 ? (
                 documents.map((doc, index) => (
-                  <DocumentItem key={index}>{doc}</DocumentItem>
+                  <DocumentItem key={index}>
+                    {doc}
+                    <img src="../../img/checked.svg" />
+                  </DocumentItem>
                 ))
               ) : (
                 <DocumentItem>서류가 없습니다.</DocumentItem>
@@ -137,6 +140,11 @@ const DocumentItem = styled.div`
   border-radius: 15px;
   background: #fffdc9;
   margin-bottom: 8px;
+  justify-content: space-between;
+  img {
+    width: 23px;
+    height: 23px;
+  }
 `;
 
 const DocumentBox = styled.div`
