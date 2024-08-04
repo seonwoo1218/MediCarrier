@@ -1,10 +1,24 @@
-import React, { useState } from "react";
-import axios from "axios"; // axios 불러오기
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import styled from "styled-components";
+import MediInfoModal from "./MediInfoModal";
 
-const BasicInfoModal = ({ basicInfo, setBasicInfo, onClose }) => {
-  const [formState, setFormState] = useState(basicInfo);
+const BasicInfoModal = ({
+  selectedCountry,
+  basicInfo,
+  setBasicInfo,
+  onClose,
+}) => {
+  const [formState, setFormState] = useState(basicInfo || {});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSexDropdownOpen, setIsSexDropdownOpen] = useState(false);
+  const [isPregnantDropdownOpen, setIsPregnantDropdownOpen] = useState(false);
+  const [errorMessages, setErrorMessages] = useState({});
+
+  useEffect(() => {
+    setFormState(basicInfo || {});
+  }, [basicInfo]);
+
   const bloodTypes = [
     "RH+ A",
     "RH- A",
@@ -16,9 +30,18 @@ const BasicInfoModal = ({ basicInfo, setBasicInfo, onClose }) => {
     "RH- O",
   ];
 
+  const sexOptions = ["남", "여"];
+
+  const pregnantOptions = ["임신중", "임신 중 아님", "가능성 있음"];
+
+  const isSameValues = JSON.stringify(basicInfo) === JSON.stringify(formState);
+  const [isMediInfoModalOpen, setIsMediInfoModalOpen] = useState(false);
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormState((prev) => ({ ...prev, [name]: value }));
+    setFormState((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSave = async () => {
@@ -29,32 +52,106 @@ const BasicInfoModal = ({ basicInfo, setBasicInfo, onClose }) => {
     }
 
     try {
-      const response = await axios({
-        method: "post",
-        url: "https://minsi.pythonanywhere.com/medicarrier/basicinfo/",
+      const getUrl = "https://minsi.pythonanywhere.com/medicarrier/translate/";
+      const postUrl = "https://minsi.pythonanywhere.com/medicarrier/basicinfo/";
+      const putUrl = "https://minsi.pythonanywhere.com/medicarrier/basicinfo/";
+
+      // Check if basic info exists with a GET request
+      let method = "post"; // Default method is POST
+      try {
+        const response = await axios({
+          method: "get",
+          url: getUrl,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (
+          response.data &&
+          response.data.medicard["한국"] &&
+          response.data.medicard["한국"].basic_info
+        ) {
+          // Data exists, so use PUT method
+          method = "put";
+        }
+      } catch (getError) {
+        if (
+          getError.response &&
+          (getError.response.status === 500 || getError.response.status === 404)
+        ) {
+          console.warn(
+            "GET request failed with status 500 or 404. Proceeding with POST request."
+          );
+        } else {
+          throw getError;
+        }
+      }
+
+      // Send data using POST or PUT method
+      const saveResponse = await axios({
+        method: method,
+        url: method === "post" ? postUrl : putUrl,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
-        data: formState,
+        data: {
+          name: formState.name || "",
+          sex: formState.sex,
+          nationality: formState.nationality || "",
+          english_name: formState.english_name || "",
+          birthdate: formState.birthdate,
+          height: formState.height || "",
+          weight: formState.weight || "",
+          bloodtype: formState.bloodtype,
+          pregnant: formState.pregnant,
+        },
       });
 
-      if (response.status !== 200 && response.status !== 201) {
+      if (saveResponse.status !== 200 && saveResponse.status !== 201) {
         throw new Error(
-          `Failed to save basic information: ${response.statusText}`
+          `Failed to save basic information: ${saveResponse.statusText}`
         );
       }
 
-      setBasicInfo(response.data);
+      setBasicInfo(formState);
       onClose();
+      setIsMediInfoModalOpen(true);
+      // If method was 'put', reload the page
+      if (method === "put") {
+        window.location.reload();
+      }
+      if (method === "post") {
+        alert(
+          "의료 정보와 기본 정보를 모두 입력한 뒤 새로 고침 하여 전체 의료 카드를 확인할 수 있습니다."
+        );
+      }
     } catch (error) {
       console.error("Failed to save basic information", error);
     }
   };
 
-  const handleBloodTypeSelect = (bloodType) => {
-    setFormState((prev) => ({ ...prev, bloodType }));
+  const areAllValuesEmpty = (obj) => {
+    return Object.values(obj).every(
+      (value) => value === "" || value === null || value === undefined
+    );
+  };
+
+  const handleBloodTypeSelect = (bloodtype) => {
+    setFormState((prev) => ({ ...prev, bloodtype }));
     setIsDropdownOpen(false);
+  };
+
+  const handleSexSelect = (sex) => {
+    setFormState((prev) => ({ ...prev, sex }));
+    setIsSexDropdownOpen(false);
+  };
+
+  const handlePregnantSelect = (status) => {
+    setFormState((prev) => ({ ...prev, pregnant: status }));
+    setIsPregnantDropdownOpen(false);
   };
 
   return (
@@ -62,57 +159,93 @@ const BasicInfoModal = ({ basicInfo, setBasicInfo, onClose }) => {
       <ModalContent>
         <ModalHeader>
           <ModalTitle>기본 정보 수정</ModalTitle>
-          <SaveButton onClick={handleSave}>저장</SaveButton>
+          <SaveButton
+            disabled={
+              areAllValuesEmpty(basicInfo)
+                ? !Object.values(formState).some((val) => val !== "")
+                : isSameValues
+            }
+            onClick={isSameValues ? undefined : handleSave}
+          >
+            저장
+          </SaveButton>
         </ModalHeader>
         <ModalBody>
+          {Object.keys(errorMessages).length > 0 && (
+            <ErrorMessages>
+              {Object.entries(errorMessages).map(([field, messages]) => (
+                <ErrorMessage key={field}>{messages.join(", ")}</ErrorMessage>
+              ))}
+            </ErrorMessages>
+          )}
           <InputRow>
             <InputLabel>이름</InputLabel>
-            <Input name="이름" value={formState.name} onChange={handleChange} />
+            <Input
+              name="name"
+              value={formState.name || ""}
+              onChange={handleChange}
+            />
           </InputRow>
           <InputRow>
             <InputLabel>성별</InputLabel>
-            <Select name="성별" value={formState.sex} onChange={handleChange}>
-              <option value="남">남</option>
-              <option value="여">여</option>
-            </Select>
+            <Dropdown>
+              <DropdownButton
+                onClick={() => setIsSexDropdownOpen(!isSexDropdownOpen)}
+              >
+                {formState.sex || "성별 선택"}
+              </DropdownButton>
+              {isSexDropdownOpen && (
+                <DropdownMenu>
+                  {sexOptions.map((sex) => (
+                    <DropdownItem
+                      key={sex}
+                      onClick={() => handleSexSelect(sex)}
+                    >
+                      {sex}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              )}
+            </Dropdown>
           </InputRow>
           <InputRow>
             <InputLabel>국적</InputLabel>
             <Input
-              name="국적"
-              value={formState.nationality}
+              name="nationality"
+              value={formState.nationality || ""}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
             <InputLabel>영어 이름</InputLabel>
             <Input
-              name="영어 이름"
-              value={formState.nameEng}
+              name="english_name"
+              value={formState.english_name || ""}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
             <InputLabel>생년월일</InputLabel>
             <Input
-              name="생년월일"
-              value={formState.birthdate}
+              type="date"
+              name="birthdate"
+              value={formState.birthdate || ""}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
             <InputLabel>신장</InputLabel>
             <Input
-              name="신장"
-              value={formState.height}
+              name="height"
+              value={formState.height || ""}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
             <InputLabel>몸무게</InputLabel>
             <Input
-              name="몸무게"
-              value={formState.weight}
+              name="weight"
+              value={formState.weight || ""}
               onChange={handleChange}
             />
           </InputRow>
@@ -122,16 +255,16 @@ const BasicInfoModal = ({ basicInfo, setBasicInfo, onClose }) => {
               <DropdownButton
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
-                {formState.bloodType || "혈액형 선택"}
+                {formState.bloodtype || "혈액형 선택"}
               </DropdownButton>
               {isDropdownOpen && (
                 <DropdownMenu>
-                  {bloodTypes.map((bloodType) => (
+                  {bloodTypes.map((bloodtype) => (
                     <DropdownItem
-                      key={bloodType}
-                      onClick={() => handleBloodTypeSelect(bloodType)}
+                      key={bloodtype}
+                      onClick={() => handleBloodTypeSelect(bloodtype)}
                     >
-                      {bloodType}
+                      {bloodtype}
                     </DropdownItem>
                   ))}
                 </DropdownMenu>
@@ -140,15 +273,27 @@ const BasicInfoModal = ({ basicInfo, setBasicInfo, onClose }) => {
           </InputRow>
           <InputRow>
             <InputLabel>임신여부</InputLabel>
-            <Select
-              name="임신여부"
-              value={formState.pregnant}
-              onChange={handleChange}
-            >
-              <option value="임신 중">임신 중</option>
-              <option value="임신 중 아님">임신 중 아님</option>
-              <option value="가능성 있음">가능성 있음</option>
-            </Select>
+            <Dropdown>
+              <DropdownButton
+                onClick={() =>
+                  setIsPregnantDropdownOpen(!isPregnantDropdownOpen)
+                }
+              >
+                {formState.pregnant || "임신여부 선택"}
+              </DropdownButton>
+              {isPregnantDropdownOpen && (
+                <DropdownMenu>
+                  {pregnantOptions.map((status) => (
+                    <DropdownItem
+                      key={status}
+                      onClick={() => handlePregnantSelect(status)}
+                    >
+                      {status}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              )}
+            </Dropdown>
           </InputRow>
         </ModalBody>
       </ModalContent>
@@ -158,6 +303,7 @@ const BasicInfoModal = ({ basicInfo, setBasicInfo, onClose }) => {
 
 export default BasicInfoModal;
 
+// Styled Components
 const ModalOverlay = styled.div`
   position: fixed;
   max-width: 393px;
@@ -229,7 +375,6 @@ const InputLabel = styled.label`
   color: #6f6f6f;
   font-family: "Pretendard";
   font-size: 14px;
-  font-style: normal;
   font-weight: 500;
   line-height: normal;
   flex: 1;
@@ -240,25 +385,6 @@ const Input = styled.input`
   text-align: right;
   font-family: "Pretendard";
   font-size: 14px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  flex: 2;
-  padding: 5px;
-  border: none;
-  border-bottom: none;
-  border-radius: 5px;
-  &:focus {
-    outline: none;
-  }
-`;
-
-const Select = styled.select`
-  color: #000;
-  text-align: right;
-  font-family: "Pretendard";
-  font-size: 14px;
-  font-style: normal;
   font-weight: 600;
   line-height: normal;
   flex: 2;
@@ -313,4 +439,13 @@ const DropdownItem = styled.div`
   &:hover {
     background-color: #f0f0f0;
   }
+`;
+
+const ErrorMessages = styled.div`
+  color: red;
+  margin-bottom: 15px;
+`;
+
+const ErrorMessage = styled.div`
+  margin-bottom: 5px;
 `;

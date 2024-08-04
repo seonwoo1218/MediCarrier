@@ -124,15 +124,15 @@ function SymptomPharmScript() {
   `;
   // Convert JSX to HTML string
   //const scriptComponentsString = ReactDOMServer.renderToStaticMarkup(scriptComponents);
-
   const handleNext = async () => {
-    setScriptComponents(scriptComponents);
+    const scriptDate = new Date().toISOString();
+    // setScriptComponents({ scriptComponents, scriptDate });
+
     try {
+      // 서버에 스크립트 전송
       const response = await axios.post(
         "https://minsi.pythonanywhere.com/medicarrier/script/",
-        {
-          script: scriptComponents,
-        },
+        { script: scriptComponents, created_at: scriptDate },
         {
           headers: {
             "Content-Type": "application/json",
@@ -141,20 +141,29 @@ function SymptomPharmScript() {
         }
       );
 
+      // 응답 상태 확인
       if (response.status !== 200) {
-        throw new Error(`Failed to save script: ${response.statusText}`);
+        throw new Error(`스크립트 저장 실패: ${response.statusText}`);
       }
 
+      // 응답 데이터에서 번역된 스크립트 가져오기
       const data = response.data;
-      console.log("Script saved:", data);
+      console.log("응답 데이터:", data);
 
-      setTranslatedScript(data.translated_script);
-      navigate("/local-pharm-script", {
-        state: { translatedScript: data.translated_script },
-      });
+      if (data.translated_script) {
+        // 상태에서 translatedScript 가져오기 (이 부분은 필요 없을 수 있음)
+        // const { transScriptComponents } = useScriptStore.getState();
+
+        // 페이지 이동
+        navigate("/local-pharm-script", {
+          state: { translatedScript: data.translated_script },
+        });
+      } else {
+        console.error("응답 데이터에 번역된 스크립트가 없습니다.");
+      }
     } catch (error) {
       console.error(
-        "Error saving script:",
+        "스크립트 저장 오류:",
         error.response ? error.response.data : error.message
       );
     }
