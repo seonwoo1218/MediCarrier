@@ -1,14 +1,8 @@
-// BasicInfoModal.jsx
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "axios"; // axios 불러오기
 import styled from "styled-components";
 
-const BasicInfoModal = ({
-  selectedCountry,
-  basicInfo,
-  setBasicInfo,
-  onClose,
-}) => {
+const BasicInfoModal = ({ basicInfo, setBasicInfo, onClose }) => {
   const [formState, setFormState] = useState(basicInfo);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const bloodTypes = [
@@ -22,14 +16,6 @@ const BasicInfoModal = ({
     "RH- O",
   ];
 
-  const isSameValues = JSON.stringify(basicInfo) === JSON.stringify(formState);
-
-  const areAllValuesEmpty = (obj) => {
-    return Object.values(obj).every(
-      (value) => value === "" || value === null || value === undefined
-    );
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
@@ -42,15 +28,13 @@ const BasicInfoModal = ({
       return;
     }
 
-    const method = areAllValuesEmpty(basicInfo) ? "post" : "put";
-    const url = `https://minsi.pythonanywhere.com/medicarrier/basicinfo/`;
     try {
       const response = await axios({
-        method: method,
-        url: url,
+        method: "post",
+        url: "https://minsi.pythonanywhere.com/medicarrier/basicinfo/",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         data: formState,
       });
@@ -61,155 +45,93 @@ const BasicInfoModal = ({
         );
       }
 
-      setBasicInfo(formState);
+      setBasicInfo(response.data);
       onClose();
     } catch (error) {
       console.error("Failed to save basic information", error);
-      onClose();
     }
   };
 
-  const handleBloodTypeSelect = (bloodtype) => {
-    setFormState((prev) => ({ ...prev, bloodtype }));
+  const handleBloodTypeSelect = (bloodType) => {
+    setFormState((prev) => ({ ...prev, bloodType }));
     setIsDropdownOpen(false);
   };
-
-  function isNotEmpty(value) {
-    if (value === null || value === undefined) return false;
-    if (typeof value === "string" && value.trim() === "") return false;
-    if (Array.isArray(value) && value.length === 0) return false;
-    if (typeof value === "object" && Object.keys(value).length === 0)
-      return false;
-    return true;
-  }
-
-  function checkObjectValues(obj) {
-    for (let key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        if (!isNotEmpty(obj[key])) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
 
   return (
     <ModalOverlay>
       <ModalContent>
         <ModalHeader>
           <ModalTitle>기본 정보 수정</ModalTitle>
-          <SaveButton
-            disabled={
-              areAllValuesEmpty(basicInfo)
-                ? !checkObjectValues(formState)
-                : isSameValues
-            }
-            onClick={isSameValues ? undefined : handleSave}
-          >
-            저장
-          </SaveButton>
+          <SaveButton onClick={handleSave}>저장</SaveButton>
         </ModalHeader>
         <ModalBody>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국" ? "이름" : Object.keys(basicInfo)[0]}
-            </InputLabel>
-            <Input
-              name={Object.keys(basicInfo)[0]}
-              value={Object.values(formState)[0]}
-              onChange={handleChange}
-            />
+            <InputLabel>이름</InputLabel>
+            <Input name="이름" value={formState.name} onChange={handleChange} />
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국" ? "성별" : Object.keys(basicInfo)[1]}
-            </InputLabel>
-            <Select
-              name={Object.keys(basicInfo)[1]}
-              value={Object.values(formState)[1]}
-              onChange={handleChange}
-            >
+            <InputLabel>성별</InputLabel>
+            <Select name="성별" value={formState.sex} onChange={handleChange}>
               <option value="남">남</option>
               <option value="여">여</option>
             </Select>
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국" ? "국적" : Object.keys(basicInfo)[2]}
-            </InputLabel>
+            <InputLabel>국적</InputLabel>
             <Input
-              name={Object.keys(basicInfo)[2]}
-              value={Object.values(formState)[2]}
+              name="국적"
+              value={formState.nationality}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국"
-                ? "영어 이름"
-                : Object.keys(basicInfo)[3]}
-            </InputLabel>
+            <InputLabel>영어 이름</InputLabel>
             <Input
-              name={Object.keys(basicInfo)[3]}
-              value={Object.values(formState)[3]}
+              name="영어 이름"
+              value={formState.nameEng}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국"
-                ? "생년월일"
-                : Object.keys(basicInfo)[4]}
-            </InputLabel>
+            <InputLabel>생년월일</InputLabel>
             <Input
-              name={Object.keys(basicInfo)[4]}
-              value={Object.values(formState)[4]}
-              // onChange={handleChange}
-            />
-          </InputRow>
-          <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국" ? "신장" : Object.keys(basicInfo)[5]}
-            </InputLabel>
-            <Input
-              name={Object.keys(basicInfo)[5]}
-              value={Object.values(formState)[5]}
+              name="생년월일"
+              value={formState.birthdate}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국"
-                ? "몸무게"
-                : Object.keys(basicInfo)[6]}
-            </InputLabel>
+            <InputLabel>신장</InputLabel>
             <Input
-              name={Object.keys(basicInfo)[6]}
-              value={Object.values(formState)[6]}
+              name="신장"
+              value={formState.height}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국"
-                ? "혈액형"
-                : Object.keys(basicInfo)[7]}
-            </InputLabel>
+            <InputLabel>몸무게</InputLabel>
+            <Input
+              name="몸무게"
+              value={formState.weight}
+              onChange={handleChange}
+            />
+          </InputRow>
+          <InputRow>
+            <InputLabel>혈액형</InputLabel>
             <Dropdown>
               <DropdownButton
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
-                {Object.values(formState)[7] || "혈액형 선택"}
+                {formState.bloodType || "혈액형 선택"}
               </DropdownButton>
               {isDropdownOpen && (
                 <DropdownMenu>
-                  {bloodTypes.map((bloodtype) => (
+                  {bloodTypes.map((bloodType) => (
                     <DropdownItem
-                      key={bloodtype}
-                      onClick={() => handleBloodTypeSelect(bloodtype)}
+                      key={bloodType}
+                      onClick={() => handleBloodTypeSelect(bloodType)}
                     >
-                      {bloodtype}
+                      {bloodType}
                     </DropdownItem>
                   ))}
                 </DropdownMenu>
@@ -217,14 +139,10 @@ const BasicInfoModal = ({
             </Dropdown>
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국"
-                ? "임신여부"
-                : Object.keys(basicInfo)[8]}
-            </InputLabel>
+            <InputLabel>임신여부</InputLabel>
             <Select
-              name={Object.keys(basicInfo)[8]}
-              value={Object.values(formState)[8]}
+              name="임신여부"
+              value={formState.pregnant}
               onChange={handleChange}
             >
               <option value="임신 중">임신 중</option>

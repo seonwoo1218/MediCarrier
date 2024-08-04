@@ -2,16 +2,8 @@ import React, { useState } from "react";
 import axios from "axios"; // axios 불러오기
 import styled from "styled-components";
 
-const MediInfoModal = ({ selectedCountry, mediInfo, setMediInfo, onClose }) => {
+const MediInfoModal = ({ mediInfo, setMediInfo, onClose }) => {
   const [formState, setFormState] = useState(mediInfo);
-
-  const isSameValues = JSON.stringify(mediInfo) === JSON.stringify(formState);
-
-  const areAllValuesEmpty = (obj) => {
-    return Object.values(obj).every(
-      (value) => value === "" || value === null || value === undefined
-    );
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,11 +19,11 @@ const MediInfoModal = ({ selectedCountry, mediInfo, setMediInfo, onClose }) => {
 
     try {
       const response = await axios({
-        method: areAllValuesEmpty(mediInfo) ? "post" : "put",
+        method: "post",
         url: "https://minsi.pythonanywhere.com/medicarrier/mediinfo/",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         data: formState,
       });
@@ -42,117 +34,66 @@ const MediInfoModal = ({ selectedCountry, mediInfo, setMediInfo, onClose }) => {
         );
       }
 
-      setMediInfo(formState);
+      setMediInfo(response.data);
       onClose();
     } catch (error) {
       console.error("Failed to save medical information", error);
     }
   };
 
-  function isNotEmpty(value) {
-    if (value === null || value === undefined) return false;
-    if (typeof value === "string" && value.trim() === "") return false;
-    if (Array.isArray(value) && value.length === 0) return false;
-    if (typeof value === "object" && Object.keys(value).length === 0)
-      return false;
-    return true;
-  }
-
-  function checkObjectValues(obj) {
-    for (let key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        if (!isNotEmpty(obj[key])) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
   return (
     <ModalOverlay>
       <ModalContent>
         <ModalHeader>
           <ModalTitle>의료 정보 수정</ModalTitle>
-          <SaveButton
-            disabled={
-              areAllValuesEmpty(mediInfo)
-                ? !checkObjectValues(formState)
-                : isSameValues
-            }
-            onClick={isSameValues ? undefined : handleSave}
-          >
-            저장
-          </SaveButton>
+          <SaveButton onClick={handleSave}>저장</SaveButton>
         </ModalHeader>
         <ModalBody>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국"
-                ? "몸 상태"
-                : Object.keys(mediInfo)[0]}
-            </InputLabel>
+            <InputLabel>몸 상태</InputLabel>
             <Input
-              name={Object.keys(mediInfo)[0]}
-              value={Object.values(formState)[0]}
+              name="몸 상태"
+              value={formState.condition}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국" ? "지병" : Object.keys(mediInfo)[1]}
-            </InputLabel>
+            <InputLabel>지병</InputLabel>
             <Input
-              name={Object.keys(mediInfo)[1]}
-              value={Object.values(formState)[1]}
+              name="지병"
+              value={formState.illness}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국"
-                ? "현재 복용 약"
-                : Object.keys(mediInfo)[2]}
-            </InputLabel>
+            <InputLabel>현재 복용 약</InputLabel>
             <Input
-              name={Object.keys(mediInfo)[2]}
-              value={Object.values(formState)[2]}
+              name="현재 복용 약"
+              value={formState.medicine}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국"
-                ? "알러지 유무"
-                : Object.keys(mediInfo)[3]}
-            </InputLabel>
+            <InputLabel>알러지 유무</InputLabel>
             <Input
-              name={Object.keys(mediInfo)[3]}
-              value={Object.values(formState)[3]}
+              name="알러지 유무"
+              value={formState.allergy}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국"
-                ? "진료 기록"
-                : Object.keys(mediInfo)[4]}
-            </InputLabel>
+            <InputLabel>진료 기록</InputLabel>
             <Input
-              name={Object.keys(mediInfo)[4]}
-              value={Object.values(formState)[4]}
+              name="진료 기록"
+              value={formState.diagnosis}
               onChange={handleChange}
             />
           </InputRow>
           <InputRow>
-            <InputLabel>
-              {selectedCountry === "한국"
-                ? "수술 기록"
-                : Object.keys(mediInfo)[5]}
-            </InputLabel>
+            <InputLabel>수술 기록</InputLabel>
             <Input
-              name={Object.keys(mediInfo)[5]}
-              value={Object.values(formState)[5]}
+              name="수술 기록"
+              value={formState.surgery}
               onChange={handleChange}
             />
           </InputRow>

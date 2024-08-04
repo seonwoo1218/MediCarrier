@@ -78,7 +78,7 @@ const MediCard = () => {
           });
         }
       } catch (error) {
-        if (error.response.status === 404) {
+        if (error.response.status === 500) {
           setIsLoading(false);
           setIsMediInfoModalOpen(true);
           setIsBasicInfoModalOpen(true);
