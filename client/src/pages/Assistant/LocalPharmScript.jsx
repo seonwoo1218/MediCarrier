@@ -67,7 +67,7 @@ const ButtonContainer = styled.div`
   width: 100%;
   padding: 0 20px;
   position: absolute;
-  bottom: 65px;
+  bottom: 115px;
   margin-left: 15px;
 `;
 

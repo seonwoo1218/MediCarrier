@@ -78,11 +78,12 @@ const Specialty = styled.button`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
+  position: fixed;
+  bottom: 116px;
   gap: 11px;
-  width: 100%;
   padding: 0 20px;
-  margin-top: 20px;
-  margin-bottom: 25px;
+  margin-left: 15px;
+  height: 50px;
 `;
 
 const Button = styled.button`
@@ -96,7 +97,7 @@ const Button = styled.button`
   border: none;
   border-radius: 16px;
   cursor: pointer;
-  margin-top: 320px;
+  margin-top: 0;
 `;
 
 const insuranceTypes = ["입원", "통원", "후유장해", "수술", "진단"];

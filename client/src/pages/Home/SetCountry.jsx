@@ -165,7 +165,7 @@ const SetCountry = () => {
           fontSize: "20px",
           fontWeight: "700",
           position: "fixed",
-          top: "620px",
+          top: "560px",
           left: "293px",
         }}
         onClick={() => {

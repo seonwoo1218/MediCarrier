@@ -156,5 +156,5 @@ const Button = styled.button`
   background: var(--mainblue, #4a7dff);
   border: none;
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
-  margin-top: 130px;
+  margin-top: 70px;
 `;

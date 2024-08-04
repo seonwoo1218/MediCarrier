@@ -31,6 +31,13 @@ const InputSearch = () => {
     setSearchValue(value);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      navigateToMap();
+    }
+  };
+
   return (
     <>
       <Content>
@@ -40,6 +47,7 @@ const InputSearch = () => {
             placeholder="검색어를 입력하세요"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
           <img
             src="/img/search-normal-gray.svg"

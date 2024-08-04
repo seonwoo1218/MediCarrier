@@ -47,6 +47,12 @@ const MapSearch = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (searchInput.trim() && userLocation.lat && userLocation.lng) {
+      handleSearch(); // 컴포넌트가 마운트되거나 검색어가 변경될 때 검색
+    }
+  }, [userLocation]);
+
   const handleSearchSubmit = () => {
     if (!isLoaded || !userLocation.lat || !userLocation.lng) return;
 
@@ -281,16 +287,17 @@ const ListContainer = styled.div`
 `;
 
 const ListItem = styled.div`
-  flex: 0 0 auto; /* 아이템이 고정된 너비를 가지도록 설정 */
-  width: 312px; /* 전체 너비 사용 */
-  height: 142px;
   display: flex;
-  align-items: center;
+  width: 312px;
   padding: 24px 17px;
-  margin: 10px 0; /* 가로 마진 제거 */
-  background: #fafafa;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
   border-radius: 12px;
-  cursor: pointer;
+  border: 1px solid #eaeaea;
+  background: #fafafa;
+  margin-bottom: 12px;
 `;
 
 const InfoContainer = styled.div`
@@ -346,14 +353,15 @@ const DetailText = styled.p`
 const MoreButton = styled.button`
   border: none;
   background: none;
-  font-family: "Pretendard";
-  font-size: 14px;
-  color: black;
-  text-decoration: none;
-  margin-left: auto;
-  margin-top: auto;
-  cursor: pointer;
-  z-index: 100;
+  color: var(--black, #000);
+  font-family: Pretendard;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: -0.48px;
+  display: flex;
+  align-items: flex-end;
 `;
 
 const LoadingText = styled.p`

@@ -12,7 +12,6 @@ const PageContainer = styled.div`
   height: 100vh;
   background: #fafafa;
   overflow-y: auto;
-
 `;
 
 const Container = styled.div`
@@ -64,9 +63,9 @@ const Option = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 172px;
-  height: 205px;
-  padding: 31px 48px;
+  width: 96px;
+  height: 147px;
+  padding: 29px 38px;
   gap: 10px;
   border-radius: 10px;
   cursor: pointer;
@@ -85,11 +84,12 @@ const Icon = styled.img`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
+  position: fixed;
+  bottom: 116px;
   gap: 11px;
-  width: 100%;
   padding: 0 20px;
-  margin-top: 20px;
-  margin-bottom: 25px;
+  margin-left: 15px;
+  height: 50px;
 `;
 
 const Button = styled.button`
@@ -103,7 +103,7 @@ const Button = styled.button`
   border: none;
   border-radius: 16px;
   cursor: pointer;
-  margin-top: 155px;
+  margin-top: 0;
 `;
 
 function SelectCondition() {
@@ -119,7 +119,7 @@ function SelectCondition() {
     symptom_freq,
     illness_etc,
     medicine_etc,
-    etc
+    etc,
   } = location.state || {};
   const [selected, setSelected] = useState(null);
 
@@ -128,7 +128,6 @@ function SelectCondition() {
   };
 
   const handleNext = () => {
-    
     if (selected === "질병") {
       navigate("/select-insurance-type-d", {
         state: {
@@ -142,7 +141,7 @@ function SelectCondition() {
           illness_etc, // 만성 질환
           medicine_etc, // 현재 복용 중인 약
           etc, // 추가 정보
-          ins_req1: selected // 질병 또는 상해
+          ins_req1: selected, // 질병 또는 상해
         },
       });
     } else if (selected === "상해") {
@@ -150,7 +149,7 @@ function SelectCondition() {
         state: {
           facility,
           hospital_type, // 병원 유형
-                //recommended_hospitals, // 추천 병원
+          //recommended_hospitals, // 추천 병원
           symptom_type, // 선택된 증상들
           symptom_etc, // 사용자 입력 증상
           symptom_start, // 증상 시작 기간
@@ -159,7 +158,6 @@ function SelectCondition() {
           medicine_etc, // 현재 복용 중인 약
           etc, // 추가 정보
           ins_req1: selected, // 질병 또는 상해
-          
         },
       });
     }

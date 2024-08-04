@@ -91,7 +91,7 @@ const ButtonContainer = styled.div`
   gap: 11px;
   width: 100%;
   padding: 0 20px;
-  margin-top: 20px;
+  margin-top: 23px;
   margin-bottom: 25px;
 `;
 
