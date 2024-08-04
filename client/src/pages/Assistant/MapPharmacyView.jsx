@@ -160,6 +160,10 @@ const PageContainer = styled.div`
   height: 100vh;
   background: #fafafa;
   overflow-y: auto;
+  -ms-overflow-style: none;
+  ::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const Container = styled.div`
@@ -222,20 +226,23 @@ const ListContainer = styled.div`
     display: none; /* Chrome, Safari, Opera */
   }
   width: 100%;
+  margin-bottom: 20px;
 `;
 
 const ListItem = styled.div`
   flex: 0 0 auto; /* 아이템이 고정된 너비를 가지도록 설정 */
-  width: 100%; /* 전체 너비 사용 */
-  max-width: 353px; /* 최대 너비 설정 */
-  height: 190px;
+  width: 319px;
+  height: 142px;
   display: flex;
   align-items: center;
-  padding: 15px;
-  margin: 10px 0; /* 가로 마진 제거 */
+  padding: 24px 17px;
+  margin: 12px 20px;
   background: "#F8F8F8";
   border-radius: 15px;
   cursor: pointer;
+  border-radius: 12px;
+  border: 1px solid #eaeaea;
+  background: #fafafa;
 `;
 
 const InfoContainer = styled.div`
@@ -299,6 +306,7 @@ const MoreButton = styled.a`
 `;
 
 const ButtonContainer = styled.div`
+  position: fixed;
   display: flex;
   justify-content: center;
   gap: 11px;
@@ -306,6 +314,7 @@ const ButtonContainer = styled.div`
   padding: 0 20px;
   margin-top: 20px;
   margin-bottom: 25px;
+  bottom: 90px;
 `;
 
 const Button = styled.button`
@@ -319,6 +328,7 @@ const Button = styled.button`
   border: none;
   border-radius: 16px;
   cursor: pointer;
+  box-shadow: 0px 0px 11.2px 0px rgba(0, 0, 0, 0.25);
 `;
 
 const LoadingText = styled.p`

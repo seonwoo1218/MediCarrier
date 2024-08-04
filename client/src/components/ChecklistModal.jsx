@@ -68,7 +68,7 @@ function ChecklistModal({ onClose }) {
         {
           text: (
             <>
-              <div style={{ padding: "0 328px 0 0" }}>질병</div>
+              <div style={{ padding: "0 320px 0 0" }}>질병</div>
               <p>감기, 독감, 또는 고혈압과 같은 건강 상태의 변화</p>
             </>
           ),
@@ -77,7 +77,7 @@ function ChecklistModal({ onClose }) {
         {
           text: (
             <>
-              <div style={{ padding: "0 328px 0 0" }}>상해</div>
+              <div style={{ padding: "0 320px 0 0" }}>상해</div>
               <p>사고로 인한 골절, 타박상, 또는 화상과 같은 신체 손상</p>
             </>
           ),
@@ -200,7 +200,7 @@ const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 393px;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
