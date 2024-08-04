@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import ProgressIndicator from "../../components/ProgressIndicator";
-import useScriptStore, { onPostScript } from "../../assets/scriptStore";
+import useScriptStore from "../../assets/scriptStore";
 import axios from "axios";
 
 const PageContainer = styled.div`
@@ -118,13 +118,13 @@ function SymptomScript() {
     `;
   const handleNext = async () => {
     const scriptDate = new Date().toISOString();
-    setScriptComponents({ scriptComponents, scriptDate });
+    // setScriptComponents({ scriptComponents, scriptDate });
 
     try {
       // 서버에 스크립트 전송
       const response = await axios.post(
         "https://minsi.pythonanywhere.com/medicarrier/script/",
-        { script: scriptComponents },
+        { script: scriptComponents, created_at: scriptDate },
         {
           headers: {
             "Content-Type": "application/json",

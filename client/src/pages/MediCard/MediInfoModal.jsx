@@ -1,13 +1,32 @@
-import React, { useState } from "react";
-import axios from "axios"; // axios 불러오기
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import styled from "styled-components";
 
-const MediInfoModal = ({ mediInfo, setMediInfo, onClose }) => {
-  const [formState, setFormState] = useState(mediInfo);
+const MediInfoModal = ({ selectedCountry, mediInfo, setMediInfo, onClose }) => {
+  const [formState, setFormState] = useState(mediInfo || {});
+  const [errorMessages, setErrorMessages] = useState({});
+
+  const fieldLabels = {
+    condition: "몸 상태",
+    illness: "지병",
+    medicine: "현재 복용 약",
+    allergy: "알러지 유무",
+    diagnosis: "진료 기록",
+    surgery: "수술 기록",
+  };
+
+  useEffect(() => {
+    setFormState(mediInfo || {});
+  }, [mediInfo]);
+
+  const isSameValues = JSON.stringify(mediInfo) === JSON.stringify(formState);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormState((prev) => ({ ...prev, [name]: value }));
+    setFormState((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSave = async () => {
@@ -17,28 +36,79 @@ const MediInfoModal = ({ mediInfo, setMediInfo, onClose }) => {
       return;
     }
 
+    const getUrl = "https://minsi.pythonanywhere.com/medicarrier/translate/";
+    const postUrl = "https://minsi.pythonanywhere.com/medicarrier/mediinfo/";
+    const putUrl = "https://minsi.pythonanywhere.com/medicarrier/mediinfo/";
+
+    let method = "post";
+
     try {
-      const response = await axios({
-        method: "post",
-        url: "https://minsi.pythonanywhere.com/medicarrier/mediinfo/",
+      try {
+        const response = await axios({
+          method: "get",
+          url: getUrl,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (
+          response.data &&
+          response.data.medicard["한국"] &&
+          response.data.medicard["한국"].medi_info
+        ) {
+          method = "put";
+        }
+      } catch (getError) {
+        if (
+          getError.response &&
+          (getError.response.status === 500 || getError.response.status === 404)
+        ) {
+          console.warn(
+            "GET request failed with status 500 or 404. Proceeding with POST request."
+          );
+        } else {
+          throw getError;
+        }
+      }
+
+      const saveResponse = await axios({
+        method: method,
+        url: method === "post" ? postUrl : putUrl,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
         data: formState,
       });
 
-      if (response.status !== 200 && response.status !== 201) {
+      if (saveResponse.status !== 200 && saveResponse.status !== 201) {
         throw new Error(
-          `Failed to save medical information: ${response.statusText}`
+          `Failed to save medical information: ${saveResponse.statusText}`
         );
       }
 
-      setMediInfo(response.data);
+      setMediInfo(formState);
       onClose();
+      // If method was 'put', reload the page
+      if (method === "put") {
+        window.location.reload();
+      }
+      if (method === "post") {
+        alert(
+          "의료 정보와 기본 정보를 모두 입력한 뒤 새로 고침 하여 전체 의료 카드를 확인할 수 있습니다."
+        );
+      }
     } catch (error) {
       console.error("Failed to save medical information", error);
     }
+  };
+
+  const areAllValuesEmpty = (obj) => {
+    return Object.values(obj).every(
+      (value) => value === "" || value === null || value === undefined
+    );
   };
 
   return (
@@ -46,57 +116,38 @@ const MediInfoModal = ({ mediInfo, setMediInfo, onClose }) => {
       <ModalContent>
         <ModalHeader>
           <ModalTitle>의료 정보 수정</ModalTitle>
-          <SaveButton onClick={handleSave}>저장</SaveButton>
+          <SaveButton
+            disabled={areAllValuesEmpty(formState) || isSameValues}
+            onClick={isSameValues ? undefined : handleSave}
+          >
+            저장
+          </SaveButton>
         </ModalHeader>
         <ModalBody>
-          <InputRow>
-            <InputLabel>몸 상태</InputLabel>
-            <Input
-              name="몸 상태"
-              value={formState.condition}
-              onChange={handleChange}
-            />
-          </InputRow>
-          <InputRow>
-            <InputLabel>지병</InputLabel>
-            <Input
-              name="지병"
-              value={formState.illness}
-              onChange={handleChange}
-            />
-          </InputRow>
-          <InputRow>
-            <InputLabel>현재 복용 약</InputLabel>
-            <Input
-              name="현재 복용 약"
-              value={formState.medicine}
-              onChange={handleChange}
-            />
-          </InputRow>
-          <InputRow>
-            <InputLabel>알러지 유무</InputLabel>
-            <Input
-              name="알러지 유무"
-              value={formState.allergy}
-              onChange={handleChange}
-            />
-          </InputRow>
-          <InputRow>
-            <InputLabel>진료 기록</InputLabel>
-            <Input
-              name="진료 기록"
-              value={formState.diagnosis}
-              onChange={handleChange}
-            />
-          </InputRow>
-          <InputRow>
-            <InputLabel>수술 기록</InputLabel>
-            <Input
-              name="수술 기록"
-              value={formState.surgery}
-              onChange={handleChange}
-            />
-          </InputRow>
+          {Object.keys(errorMessages).length > 0 && (
+            <ErrorMessages>
+              {Object.entries(errorMessages).map(([field, messages]) => (
+                <ErrorMessage key={field}>{messages.join(", ")}</ErrorMessage>
+              ))}
+            </ErrorMessages>
+          )}
+          {[
+            "condition",
+            "illness",
+            "medicine",
+            "allergy",
+            "diagnosis",
+            "surgery",
+          ].map((field) => (
+            <InputRow key={field}>
+              <InputLabel>{fieldLabels[field]}</InputLabel>
+              <Input
+                name={field}
+                value={formState[field] || ""}
+                onChange={handleChange}
+              />
+            </InputRow>
+          ))}
         </ModalBody>
       </ModalContent>
     </ModalOverlay>
@@ -105,6 +156,7 @@ const MediInfoModal = ({ mediInfo, setMediInfo, onClose }) => {
 
 export default MediInfoModal;
 
+// Styled Components
 const ModalOverlay = styled.div`
   position: fixed;
   max-width: 393px;
@@ -176,7 +228,6 @@ const InputLabel = styled.label`
   color: #6f6f6f;
   font-family: "Pretendard";
   font-size: 14px;
-  font-style: normal;
   font-weight: 500;
   line-height: normal;
   flex: 1;
@@ -187,7 +238,6 @@ const Input = styled.input`
   text-align: right;
   font-family: "Pretendard";
   font-size: 14px;
-  font-style: normal;
   font-weight: 600;
   line-height: normal;
   flex: 2;
@@ -198,4 +248,13 @@ const Input = styled.input`
   &:focus {
     outline: none;
   }
+`;
+
+const ErrorMessages = styled.div`
+  color: red;
+  margin-bottom: 15px;
+`;
+
+const ErrorMessage = styled.div`
+  margin-bottom: 5px;
 `;

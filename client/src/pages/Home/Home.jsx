@@ -33,7 +33,8 @@ function Home() {
   const { country, startDate, endDate } = useTripStore();
   const insuranceType = useTripStore((state) => state.insuranceType);
   const { insuranceName } = useInsuranceStore();
-  const { scriptComponents, scriptDate } = useScriptStore();
+  const { scriptComponents } = useScriptStore();
+  const [scriptDate, setScriptDate] = useState("");
   const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);
   const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
 
@@ -82,10 +83,46 @@ function Home() {
       const userId = localStorage.getItem("userId");
       if (userId) {
         await onGetScript();
+        console.log();
       }
     };
 
     fetchScriptData();
+  }, []);
+
+  const fetchScriptComponents = async (userId) => {
+    try {
+      const url = `https://minsi.pythonanywhere.com/medicarrier/script?user=${userId}`;
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error(
+        "오류:",
+        error.response ? error.response.data : error.message
+      );
+      return null;
+    }
+  };
+  useEffect(() => {
+    const fetchData = async () => {
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        // 스크립트 데이터 가져오기
+        const scriptData = await fetchScriptComponents(userId);
+        if (scriptData && scriptData.length > 0) {
+          const latestScript = scriptData[scriptData.length - 1];
+          setScriptDate(latestScript.created_at); // created_at 값을 scriptDate 상태에 저장
+        }
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleInsuranceBox = () => {

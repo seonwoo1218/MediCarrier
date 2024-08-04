@@ -87,6 +87,7 @@ const NavBarContainer = styled.div`
   left: 196px;
   transform: translateX(-50%);
   border-top: 1px solid #e0e0e0;
+  z-index: 100;
 `;
 
 const NavItemBase = styled(Link)`

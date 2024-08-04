@@ -91,7 +91,7 @@ function LocalScript() {
   const { setTransScriptComponents } = useScriptStore((state) => state);
 
   const handleNext = () => {
-    setTransScriptComponents(translatedScript);
+    // setTransScriptComponents(translatedScript);
     navigate("/home");
   };
 
