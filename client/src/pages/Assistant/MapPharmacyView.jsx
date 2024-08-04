@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 import styled from "styled-components";
 import ProgressIndicator from "../../components/ProgressIndicator";
 
@@ -28,12 +28,14 @@ const MapPharmacyView = () => {
       console.error("Geolocation not supported by this browser.");
     }
   }, []);
-  
+
   useEffect(() => {
     if (location.lat && location.lng) {
       setLoading(true); // 로딩 시작
       axios
-        .get(`http://localhost:8000/medicarrier/pharmacies/?lat=${location.lat}&lng=${location.lng}`)
+        .get(
+          `https://minsi.pythonanywhere.com/medicarrier/pharmacies/?lat=${location.lat}&lng=${location.lng}`
+        )
         .then((response) => {
           // 별점 순으로 정렬하여 상위 3개만 선택
           const sortedPharmacies = response.data.results
@@ -54,21 +56,26 @@ const MapPharmacyView = () => {
   };
 
   const handleNext = () => {
-    if (selected) {
-      const selectedPharmacy = pharmacies.find(pharmacy => pharmacy.place_id === selected);
-      navigate("/symptom-form", { state: { selectedPharmacy } });
-    }
+    const selectedPharmacy = pharmacies.find(
+      (pharmacy) => pharmacy.place_id === selected
+    );
+    navigate("/symptom-pharm-form", { state: { selectedPharmacy } });
   };
 
   const handleMoreInfo = (placeId) => {
-    window.open(`https://www.google.com/maps/place/?q=place_id:${placeId}`, '_blank');
+    window.open(
+      `https://www.google.com/maps/place/?q=place_id:${placeId}`,
+      "_blank"
+    );
   };
 
   const handleNearbySearch = () => {
     if (location.lat && location.lng) {
       setLoading(true);
       axios
-        .get(`http://localhost:8000/medicarrier/pharmacies/?lat=${location.lat}&lng=${location.lng}`)
+        .get(
+          `https://minsi.pythonanywhere.com/medicarrier/pharmacies/?lat=${location.lat}&lng=${location.lng}`
+        )
         .then((response) => {
           const sortedPharmacies = response.data.results
             .sort((a, b) => b.rating - a.rating)
@@ -109,7 +116,10 @@ const MapPharmacyView = () => {
                 <InfoContainer>
                   <ImagePlaceholder>
                     {pharmacy.photo_url ? (
-                      <PlaceholderImage src={pharmacy.photo_url} alt={pharmacy.name} />
+                      <PlaceholderImage
+                        src={pharmacy.photo_url}
+                        alt={pharmacy.name}
+                      />
                     ) : (
                       <PlaceholderText>No Image</PlaceholderText>
                     )}
@@ -118,9 +128,11 @@ const MapPharmacyView = () => {
                     <DetailText>{pharmacy.distance.toFixed(0)}m</DetailText>
                     <PharmacyName>{pharmacy.name}</PharmacyName>
                     <DetailText>{pharmacy.address}</DetailText>
-                    <DetailText>⭐ {pharmacy.rating || '정보 없음'}</DetailText>
+                    <DetailText>⭐ {pharmacy.rating || "정보 없음"}</DetailText>
                   </InfoText>
-                  <MoreButton onClick={() => handleMoreInfo(pharmacy.place_id)}>더보기</MoreButton>
+                  <MoreButton onClick={() => handleMoreInfo(pharmacy.place_id)}>
+                    더보기
+                  </MoreButton>
                 </InfoContainer>
               </ListItem>
             ))
@@ -130,7 +142,7 @@ const MapPharmacyView = () => {
           <Button onClick={() => navigate(-1)} primary={false}>
             이전
           </Button>
-          <Button onClick={handleNext} primary={true} disabled={!selected}>
+          <Button onClick={handleNext} primary={true}>
             다음
           </Button>
         </ButtonContainer>
@@ -221,10 +233,9 @@ const ListItem = styled.div`
   align-items: center;
   padding: 15px;
   margin: 10px 0; /* 가로 마진 제거 */
-  background:  "#F8F8F8";
+  background: "#F8F8F8";
   border-radius: 15px;
   cursor: pointer;
-
 `;
 
 const InfoContainer = styled.div`

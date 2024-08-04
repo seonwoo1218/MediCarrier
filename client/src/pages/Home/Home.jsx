@@ -5,6 +5,9 @@ import useTripStore from "../../assets/tripStore";
 import useInsuranceStore from "../../assets/insuranceStore";
 import InsuranceModal from "../../components/InsuranceModal";
 import ChecklistModal from "../../components/ChecklistModal";
+import useScriptStore, { onGetScript } from "../../assets/scriptStore";
+import { onGet } from "../../assets/tripStore";
+
 import axios from "axios";
 
 function Home() {
@@ -24,25 +27,30 @@ function Home() {
   };
 
   const navigateToAssistRecord = () => {
-    navigate("/assist.record");
+    navigate("/script");
   };
 
   const { country, startDate, endDate } = useTripStore();
-  const { insuranceType, insuranceName } = useInsuranceStore();
+  const insuranceType = useTripStore((state) => state.insuranceType);
+  const { insuranceName } = useInsuranceStore();
+  const { scriptComponents, scriptDate } = useScriptStore();
   const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);
   const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
 
   const [tripData, setTripData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userId = localStorage.getItem("userId");
+        const data = await onGet();
+        setTripData(data);
         const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("userId");
 
         const response = await axios.get(
-          "http://127.0.0.1:8000/medicarrier/register.trip/",
+          "https://minsi.pythonanywhere.com/medicarrier/register.trip/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -67,6 +75,17 @@ function Home() {
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchScriptData = async () => {
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        await onGetScript();
+      }
+    };
+
+    fetchScriptData();
   }, []);
 
   const handleInsuranceBox = () => {
@@ -313,7 +332,7 @@ function Home() {
         <MyInsurance>
           내 보험
           <MyInsuranceBox onClick={handleInsuranceBox}>
-            {insuranceType ? (
+            {insuranceType.length > 2 ? (
               <>
                 <div>
                   <div
@@ -391,13 +410,13 @@ function Home() {
           <InsuranceModal onClose={() => setIsInsuranceModalOpen(false)} />
         )}
 
-        {isTripEnded && (
+        {scriptDate && (
           <>
             <AssistRecord>
               어시스트 이용 기록
               <AssistRecordBox onClick={navigateToAssistRecord}>
                 <div>
-                  <h2>{new Date(endDate).toLocaleDateString()}</h2>
+                  <h2>{new Date(scriptDate).toLocaleDateString()}</h2>
                   <p>
                     어시스트 이용 기록 <br /> 확인하러 가기
                   </p>
@@ -460,10 +479,10 @@ function Home() {
             </Contact>
           </AboutInsuranceBoxes>
         </AboutInsurance>
-        <Chatting>
+        {/* <Chatting>
           진행 중인 채팅 상황
           <img src="../img/arrow-right-white.svg" />
-        </Chatting>
+        </Chatting> */}
         <Blank></Blank>
       </HomeContainer>
     </>
@@ -561,28 +580,28 @@ const AssistRecordBox = styled.div`
   }
 `;
 
-const Chatting = styled.div`
-  margin: 0 0 30px 20px;
-  display: flex;
-  width: 321px;
-  padding: 13px 16px;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  border-radius: 68px;
-  background: linear-gradient(90deg, #2e68ff 0%, #4a7dff 55%);
-  color: #fff;
-  font-family: Pretendard;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  img {
-    width: 24px;
-    height: 24px;
-  }
-`;
+// const Chatting = styled.div`
+//   margin: 0 0 30px 20px;
+//   display: flex;
+//   width: 321px;
+//   padding: 13px 16px;
+//   flex-direction: row;
+//   justify-content: space-between;
+//   align-items: center;
+//   gap: 10px;
+//   border-radius: 68px;
+//   background: linear-gradient(90deg, #2e68ff 0%, #4a7dff 55%);
+//   color: #fff;
+//   font-family: Pretendard;
+//   font-size: 16px;
+//   font-style: normal;
+//   font-weight: 600;
+//   line-height: normal;
+//   img {
+//     width: 24px;
+//     height: 24px;
+//   }
+// `;
 
 const AboutInsurance = styled.div`
   color: var(--black, #000);

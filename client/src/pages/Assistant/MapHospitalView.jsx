@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 import styled from "styled-components";
 import ProgressIndicator from "../../components/ProgressIndicator";
 
@@ -12,7 +12,7 @@ const MapHospitalView = () => {
   const navigate = useNavigate();
   const locationState = useLocation().state || {};
   const { facility, hospital_type } = locationState;
-  
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -30,16 +30,20 @@ const MapHospitalView = () => {
       console.error("Geolocation not supported by this browser.");
     }
   }, []);
-  
+
   // 위치 정보와 keyword가 있을 때 병원 검색 API 호출
   useEffect(() => {
     if (location.lat && location.lng && hospital_type) {
       setLoading(true); // 로딩 시작
       axios
-        .get(`http://localhost:8000/medicarrier/hospitals/?lat=${location.lat}&lng=${location.lng}&keyword=${hospital_type}`)
+        .get(
+          `https://minsi.pythonanywhere.com/medicarrier/hospitals/?lat=${location.lat}&lng=${location.lng}&keyword=${hospital_type}`
+        )
         .then((response) => {
           // 병원을 별점순으로 정렬하고 상위 3개의 병원만 설정
-          const sortedHospitals = response.data.results.sort((a, b) => b.rating - a.rating).slice(0, 3);
+          const sortedHospitals = response.data.results
+            .sort((a, b) => b.rating - a.rating)
+            .slice(0, 3);
           setHospitals(sortedHospitals);
           setLoading(false); // 로딩 완료
         })
@@ -55,24 +59,31 @@ const MapHospitalView = () => {
   };
 
   const handleNext = () => {
-    if (selected) {
-      // 선택된 병원 ID를 배열로 만듭니다.
-      const selectedHospitalIds = [selected]; // 선택된 병원의 ID를 배열로 생성합니다.
-      navigate("/symptom-form", { state: { facility, hospital_type, 
-        //recommended_hospitals : selectedHospitalIds 
-      } });
-    }
+    // 선택된 병원 ID를 배열로 만듭니다.
+    const selectedHospitalIds = selected ? [selected] : []; // 선택된 병원의 ID를 배열로 생성합니다.
+    navigate("/symptom-form", {
+      state: {
+        facility,
+        hospital_type,
+        //recommended_hospitals : selectedHospitalIds
+      },
+    });
   };
 
   const handleMoreInfo = (placeId) => {
-    window.open(`https://www.google.com/maps/place/?q=place_id:${placeId}`, '_blank');
+    window.open(
+      `https://www.google.com/maps/place/?q=place_id:${placeId}`,
+      "_blank"
+    );
   };
 
   const handleNearbySearch = () => {
     if (location.lat && location.lng) {
       setLoading(true);
       axios
-        .get(`http://localhost:8000/medicarrier/hospitals/?lat=${location.lat}&lng=${location.lng}`)
+        .get(
+          `https://minsi.pythonanywhere.com/medicarrier/hospitals/?lat=${location.lat}&lng=${location.lng}`
+        )
         .then((response) => {
           setHospitals(response.data.results);
           setLoading(false);
@@ -110,7 +121,10 @@ const MapHospitalView = () => {
                 <InfoContainer>
                   <ImagePlaceholder>
                     {hospital.photo_url ? (
-                      <PlaceholderImage src={hospital.photo_url} alt={hospital.name} />
+                      <PlaceholderImage
+                        src={hospital.photo_url}
+                        alt={hospital.name}
+                      />
                     ) : (
                       <PlaceholderText>No Image</PlaceholderText>
                     )}
@@ -119,9 +133,11 @@ const MapHospitalView = () => {
                     <DetailText>{hospital.distance.toFixed(0)}m</DetailText>
                     <HospitalName>{hospital.name}</HospitalName>
                     <DetailText>{hospital.address}</DetailText>
-                    <DetailText>⭐ {hospital.rating || '정보 없음'}</DetailText>
+                    <DetailText>⭐ {hospital.rating || "정보 없음"}</DetailText>
                   </InfoText>
-                  <MoreButton onClick={() => handleMoreInfo(hospital.place_id)}>더보기</MoreButton>
+                  <MoreButton onClick={() => handleMoreInfo(hospital.place_id)}>
+                    더보기
+                  </MoreButton>
                 </InfoContainer>
               </ListItem>
             ))}
@@ -131,7 +147,7 @@ const MapHospitalView = () => {
           <Button onClick={() => navigate(-1)} primary={false}>
             이전
           </Button>
-          <Button onClick={handleNext} primary={true} disabled={!selected}>
+          <Button onClick={handleNext} primary={true}>
             다음
           </Button>
         </ButtonContainer>
@@ -168,12 +184,12 @@ const Title = styled.h1`
   font-family: Pretendard;
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
   text-align: left;
   line-height: 1.5;
   align-self: flex-start;
   margin-left: 20px;
-  margin-top: 51px;
+  margin-top: 25px;
 `;
 
 const Subtitle = styled.p`
@@ -200,7 +216,7 @@ const NearbyButton = styled.button`
   cursor: pointer;
   margin-left: auto;
   margin-right: 20px;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 `;
 
 const ListContainer = styled.div`
@@ -222,10 +238,9 @@ const ListItem = styled.div`
   align-items: center;
   padding: 15px;
   margin: 10px 0; /* 가로 마진 제거 */
-  background:  "#F8F8F8";
+  background: "#F8F8F8";
   border-radius: 15px;
   cursor: pointer;
-
 `;
 
 const InfoContainer = styled.div`

@@ -15,39 +15,42 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/login/", {
-        username,
-        password,
-      });
-  
+      const response = await axios.post(
+        "https://minsi.pythonanywhere.com/api/login/",
+        {
+          username,
+          password,
+        }
+      );
+
       // 로그인 성공 시 응답 데이터 확인
       console.log("로그인 응답 데이터:", response.data);
-  
+
       // 응답에서 access_token과 userId, nickname을 가져와 localStorage에 저장
       if (response.data && response.data.data) {
         const { access_token, id, nickname } = response.data.data; // 응답 데이터에서 필요 정보 추출
-  
+
         if (access_token) {
           localStorage.setItem("token", access_token); // access 토큰 저장
           console.log("저장된 access 토큰:", localStorage.getItem("token")); // 디버깅용
         } else {
           console.error("응답 데이터에서 access 토큰을 찾을 수 없습니다.");
         }
-  
+
         if (id) {
           localStorage.setItem("userId", id); // 사용자 ID를 로컬 스토리지에 저장
           console.log("저장된 사용자 ID:", localStorage.getItem("userId")); // 디버깅용
         } else {
           console.error("응답 데이터에서 사용자 ID를 찾을 수 없습니다.");
         }
-  
+
         if (nickname) {
           localStorage.setItem("userName", nickname); // 사용자 이름을 로컬 스토리지에 저장
           console.log("저장된 사용자 이름:", localStorage.getItem("userName")); // 디버깅용
         } else {
           console.error("응답 데이터에서 사용자 이름을 찾을 수 없습니다.");
         }
-  
+
         alert("로그인 성공");
         navigate("/home");
       } else {
@@ -87,8 +90,6 @@ const Login = () => {
       <ToSignin onClick={navigateToSignup} style={{ cursor: "pointer" }}>
         회원가입
       </ToSignin>
-      <img src="../../img/login_line.svg" />
-      <img src="../../img/kakaotalk.svg" style={{ cursor: "pointer" }} />
     </LoginPage>
   );
 };
@@ -96,17 +97,16 @@ const Login = () => {
 export default Login;
 
 const LoginPage = styled.div`
-  /* background-color: #ffff; */
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 133px 20px;
+  margin: 163px 20px;
   img {
     margin-bottom: 20px;
   }
   form {
     input {
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       height: 30px;
       width: 313px;
       padding: 15px 20px;

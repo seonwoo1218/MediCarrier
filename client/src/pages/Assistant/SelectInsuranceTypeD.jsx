@@ -11,7 +11,6 @@ const PageContainer = styled.div`
   height: 100vh;
   background: #fafafa;
   overflow-y: auto;
-
 `;
 
 const Container = styled.div`
@@ -116,7 +115,7 @@ function SelectInsuranceTypeD() {
     illness_etc,
     medicine_etc,
     etc,
-    ins_req1
+    ins_req1,
   } = location.state || {};
   const [selected, setSelected] = useState(null);
 
@@ -125,7 +124,7 @@ function SelectInsuranceTypeD() {
   };
 
   const handleNext = async () => {
-    const userId = localStorage.getItem("userId"); 
+    const userId = localStorage.getItem("userId");
     if (selected) {
       const stateToPass1 = {
         facility,
@@ -143,7 +142,7 @@ function SelectInsuranceTypeD() {
         disease_detail: "암", // 예를 들어 선택된 질병 세부 사항
         document: "",
       };
-  
+
       const stateToPass2 = {
         facility,
         hospital_type, // 병원 유형
@@ -157,28 +156,34 @@ function SelectInsuranceTypeD() {
         ins_req1, // 질병 또는 상해
         ins_req2: selected, // 선택된 보험 유형
       };
-  
+
       switch (selected) {
         case "입원":
         case "후유장해":
         case "수술":
           try {
             // POST 요청 보내기
-            const response = await axios.post("http://127.0.0.1:8000/medicarrier/assist/", 
-              { user: userId, ...stateToPass1 }, {
-              headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`, 
-                "Content-Type": "application/json",
-              },
-            });
-  
+            const response = await axios.post(
+              "https://minsi.pythonanywhere.com/medicarrier/assist/",
+              { user: userId, ...stateToPass1 },
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
             if (response.status === 201) {
               navigate("/document-guide", { state: stateToPass1 });
             } else {
               console.error("Failed to save data:", response.statusText);
             }
           } catch (error) {
-            console.error("Error saving data:", error.response ? error.response.data : error.message);
+            console.error(
+              "Error saving data:",
+              error.response ? error.response.data : error.message
+            );
           }
           break;
         case "통원":
@@ -192,8 +197,6 @@ function SelectInsuranceTypeD() {
       }
     }
   };
-
-
 
   return (
     <PageContainer>
