@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import MediInfoModal from "./MediInfoModal";
@@ -15,6 +15,8 @@ const BasicInfoModal = ({
   const [isPregnantDropdownOpen, setIsPregnantDropdownOpen] = useState(false);
   const [errorMessages, setErrorMessages] = useState({});
 
+  const inputRefs = useRef([]);
+
   useEffect(() => {
     setFormState(basicInfo || {});
   }, [basicInfo]);
@@ -29,19 +31,28 @@ const BasicInfoModal = ({
     "RH+ O",
     "RH- O",
   ];
-
   const sexOptions = ["남", "여"];
-
   const pregnantOptions = ["임신중", "임신 중 아님", "가능성 있음"];
 
   const isSameValues = JSON.stringify(basicInfo) === JSON.stringify(formState);
   const [isMediInfoModalOpen, setIsMediInfoModalOpen] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const nextIndex = index + 1;
+      if (nextIndex < inputRefs.current.length) {
+        inputRefs.current[nextIndex].focus();
+      }
+    }
   };
 
   const handleSave = async () => {
@@ -56,8 +67,7 @@ const BasicInfoModal = ({
       const postUrl = "https://minsi.pythonanywhere.com/medicarrier/basicinfo/";
       const putUrl = "https://minsi.pythonanywhere.com/medicarrier/basicinfo/";
 
-      // Check if basic info exists with a GET request
-      let method = "post"; // Default method is POST
+      let method = "post";
       try {
         const response = await axios({
           method: "get",
@@ -73,7 +83,6 @@ const BasicInfoModal = ({
           response.data.medicard["한국"] &&
           response.data.medicard["한국"].basic_info
         ) {
-          // Data exists, so use PUT method
           method = "put";
         }
       } catch (getError) {
@@ -89,7 +98,6 @@ const BasicInfoModal = ({
         }
       }
 
-      // Send data using POST or PUT method
       const saveResponse = await axios({
         method: method,
         url: method === "post" ? postUrl : putUrl,
@@ -119,7 +127,6 @@ const BasicInfoModal = ({
       setBasicInfo(formState);
       onClose();
       setIsMediInfoModalOpen(true);
-      // If method was 'put', reload the page
       if (method === "put") {
         window.location.reload();
       }
@@ -184,6 +191,8 @@ const BasicInfoModal = ({
               name="name"
               value={formState.name || ""}
               onChange={handleChange}
+              ref={(el) => (inputRefs.current[0] = el)}
+              onKeyDown={(e) => handleKeyDown(e, 0)}
             />
           </InputRow>
           <InputRow>
@@ -196,7 +205,7 @@ const BasicInfoModal = ({
               </DropdownButton>
               {isSexDropdownOpen && (
                 <DropdownMenu>
-                  {sexOptions.map((sex) => (
+                  {sexOptions.map((sex, index) => (
                     <DropdownItem
                       key={sex}
                       onClick={() => handleSexSelect(sex)}
@@ -214,6 +223,8 @@ const BasicInfoModal = ({
               name="nationality"
               value={formState.nationality || ""}
               onChange={handleChange}
+              ref={(el) => (inputRefs.current[1] = el)}
+              onKeyDown={(e) => handleKeyDown(e, 1)}
             />
           </InputRow>
           <InputRow>
@@ -222,6 +233,8 @@ const BasicInfoModal = ({
               name="english_name"
               value={formState.english_name || ""}
               onChange={handleChange}
+              ref={(el) => (inputRefs.current[2] = el)}
+              onKeyDown={(e) => handleKeyDown(e, 2)}
             />
           </InputRow>
           <InputRow>
@@ -231,6 +244,8 @@ const BasicInfoModal = ({
               name="birthdate"
               value={formState.birthdate || ""}
               onChange={handleChange}
+              ref={(el) => (inputRefs.current[3] = el)}
+              onKeyDown={(e) => handleKeyDown(e, 3)}
             />
           </InputRow>
           <InputRow>
@@ -239,6 +254,8 @@ const BasicInfoModal = ({
               name="height"
               value={formState.height || ""}
               onChange={handleChange}
+              ref={(el) => (inputRefs.current[4] = el)}
+              onKeyDown={(e) => handleKeyDown(e, 4)}
             />
           </InputRow>
           <InputRow>
@@ -247,6 +264,8 @@ const BasicInfoModal = ({
               name="weight"
               value={formState.weight || ""}
               onChange={handleChange}
+              ref={(el) => (inputRefs.current[5] = el)}
+              onKeyDown={(e) => handleKeyDown(e, 5)}
             />
           </InputRow>
           <InputRow>
@@ -315,7 +334,7 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 11;
+  z-index: 1000;
 `;
 
 const ModalContent = styled.div`
@@ -408,7 +427,7 @@ const DropdownButton = styled.button`
   border: none;
   border-bottom: none;
   border-radius: 5px;
-  background-color: #f8f8f8;
+  background-color: white;
   text-align: right;
   font-family: "Pretendard";
   font-size: 14px;
