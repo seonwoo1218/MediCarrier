@@ -28,7 +28,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 126px 0 47px 0;
+  margin: 66px 0 47px 0;
   h2 {
     color: var(--black, #000);
     font-family: Pretendard;
@@ -53,7 +53,7 @@ const Container = styled.div`
   img {
     width: 288px;
     height: 206px;
-    margin-bottom: 164px;
+    margin-bottom: 84px;
   }
   button {
     display: flex;

@@ -63,7 +63,7 @@ const Register = () => {
 export default Register;
 
 const SignupContainer = styled.div`
-  margin: 90px 20px 47px 20px;
+  margin: 50px 20px 17px 20px;
   h2 {
     color: var(--black, #000);
     font-family: Pretendard;
@@ -125,7 +125,7 @@ const SignupContainer = styled.div`
       border-radius: 8px;
       background: var(--Color, #4a7dff);
       border: 0;
-      margin-top: 150px;
+      margin-top: 80px;
 
       color: #fff;
       font-family: Pretendard;

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import styled from "styled-components";
 
 const MediInfoModal = ({ selectedCountry, mediInfo, setMediInfo, onClose }) => {
   const [formState, setFormState] = useState(mediInfo || {});
   const [errorMessages, setErrorMessages] = useState({});
+  const inputRefs = useRef([]);
 
   const fieldLabels = {
     condition: "몸 상태",
@@ -27,6 +28,16 @@ const MediInfoModal = ({ selectedCountry, mediInfo, setMediInfo, onClose }) => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const nextIndex = index + 1;
+      if (nextIndex < inputRefs.current.length) {
+        inputRefs.current[nextIndex].focus();
+      }
+    }
   };
 
   const handleSave = async () => {
@@ -138,13 +149,15 @@ const MediInfoModal = ({ selectedCountry, mediInfo, setMediInfo, onClose }) => {
             "allergy",
             "diagnosis",
             "surgery",
-          ].map((field) => (
+          ].map((field, index) => (
             <InputRow key={field}>
               <InputLabel>{fieldLabels[field]}</InputLabel>
               <Input
                 name={field}
                 value={formState[field] || ""}
                 onChange={handleChange}
+                ref={(el) => (inputRefs.current[index] = el)}
+                onKeyDown={(e) => handleKeyDown(e, index)}
               />
             </InputRow>
           ))}
@@ -168,7 +181,7 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  z-index: 1000;
 `;
 
 const ModalContent = styled.div`
