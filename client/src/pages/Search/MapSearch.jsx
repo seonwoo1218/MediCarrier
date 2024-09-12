@@ -3,6 +3,7 @@ import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import styled from "styled-components";
 import { useLocation } from "react-router-dom";
 import BottomSheet from "../../components/BottomSheet";
+import { GOOGLE_MAPS_API_KEY } from "../../assets/config";
 
 const GOOGLE_MAPS_LIBRARIES = ["places"];
 
@@ -18,7 +19,7 @@ const MapSearch = () => {
   const [selectedPlace, setSelectedPlace] = useState(null); // 선택된 장소
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyDaZin2coXTMhgeiOWQP25Cz3AYoiMy1xA",
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
