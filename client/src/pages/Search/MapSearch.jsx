@@ -18,7 +18,7 @@ const MapSearch = () => {
   const [selectedPlace, setSelectedPlace] = useState(null); // 선택된 장소
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyBiUBN4DAVpfYWsadzciLTbNCYtPA1UIpE",
+    googleMapsApiKey: "AIzaSyDaZin2coXTMhgeiOWQP25Cz3AYoiMy1xA",
     libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
